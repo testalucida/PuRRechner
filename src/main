@@ -1,0 +1,207 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0301 
+do_not_include_H_from_C 
+header_name {.h} 
+code_name {.cpp}
+decl {\#include <FL/Fl_Group.H>
+\#include <FL/Fl_Float_Input.H>
+\#include <FL/Fl_Int_Input.H>
+\#include <FL/Fl_Input.H>
+\#include <FL/Fl_Output.H>} {private local
+} 
+
+decl {\#include <FL/Fl_Button.H>} {private local
+} 
+
+decl {\#include <FL/Fl_Double_Window.H>} {private local
+} 
+
+decl {\#include <FL/Fl_Choice.H>} {private local
+} 
+
+decl {\#include <FL/Fl_Box.H>} {private local
+} 
+
+decl {\#include <FL/Fl.H>} {private local
+} 
+
+decl {\#include <my/TableData.h>} {private local
+} 
+
+decl {\#include <myfltk/Flx_Table.h>} {private local
+} 
+
+decl {using namespace my;} {private local
+} 
+
+decl {using namespace myfltk;} {private local
+} 
+
+Function {} {open private
+} {
+  Fl_Window {} {open
+    xywh {345 157 575 541} type Double align 80 resizable visible
+  } {
+    Fl_Group _pTopGrp {open
+      xywh {10 10 555 301} box BORDER_BOX color 52
+    } {
+      Fl_Group {} {open
+        xywh {20 22 535 53} box BORDER_BOX color 52 labelcolor 4
+      } {
+        Fl_Box {} {
+          label {Auftrag: }
+          xywh {214 41 60 16}
+        }
+        Fl_Box {} {
+          label {Vertrag: }
+          xywh {380 38 60 22} align 20
+        }
+        Fl_Input _pAuftrag {
+          xywh {276 36 100 25} box PLASTIC_THIN_DOWN_BOX
+        }
+        Fl_Input _pVertrag {
+          xywh {441 36 105 25} box PLASTIC_THIN_DOWN_BOX
+        }
+        Fl_Group _pDummy3 {open
+          xywh {550 35 5 30} resizable
+        } {}
+        Fl_Box {} {
+          label {Kunde:}
+          xywh {46 41 60 16}
+        }
+        Fl_Choice _pKunde {open
+          xywh {106 36 100 25} box GTK_UP_BOX down_box GTK_DOWN_BOX
+          code0 {_pKunde->add( "M" );}
+          code1 {_pKunde->add( "G" );}
+          code2 {_pKunde->add( "M+G" );}
+          code3 {_pKunde->value( 0 );}
+        } {}
+      }
+      Fl_Group _pDummy {open
+        xywh {200 75 15 15}
+      } {}
+      Fl_Group {} {
+        label Container open
+        xywh {20 85 535 130} box BORDER_BOX color 52 labeltype SHADOW_LABEL labelfont 2 align 21
+      } {
+        Fl_Box {} {
+          label {Einzelpreis: }
+          xywh {26 118 80 16}
+        }
+        Fl_Input _pEinzelpreis {
+          xywh {106 114 100 25} box PLASTIC_THIN_DOWN_BOX
+          class Fl_Float_Input
+        }
+        Fl_Box {} {
+          label {Anzahl:}
+          xywh {218 117 59 16} align 20
+        }
+        Fl_Input _pAnzahl {
+          xywh {276 113 74 25} box PLASTIC_THIN_DOWN_BOX
+          class Fl_Int_Input
+        }
+        Fl_Box {} {
+          label {Gesamt:}
+          xywh {375 117 64 16} align 20
+        }
+        Fl_Output _pGesamt {
+          xywh {441 112 95 25} box PLASTIC_THIN_DOWN_BOX
+        }
+        Fl_Box {} {
+          label {Tagesmiete:}
+          xywh {23 151 80 16}
+        }
+        Fl_Input _pTagesmiete {
+          xywh {106 147 54 25} box PLASTIC_THIN_DOWN_BOX
+          class Fl_Float_Input
+        }
+        Fl_Box {} {
+          label {Laufzeit:}
+          xywh {211 151 59 16} align 20
+        }
+        Fl_Input _pJahreLaufzeit {
+          xywh {276 147 29 25} box PLASTIC_THIN_DOWN_BOX
+          class Fl_Int_Input
+        }
+        Fl_Box {} {
+          label Jahre
+          xywh {305 151 59 16} align 20
+        }
+        Fl_Box {} {
+          label {Rückkauf: }
+          xywh {363 151 80 16}
+        }
+        Fl_Input _pRueckkaufswert {
+          xywh {441 147 95 25} box PLASTIC_THIN_DOWN_BOX
+          class Fl_Float_Input
+        }
+        Fl_Group _pDummy2 {open
+          xywh {540 110 15 50} resizable
+        } {}
+        Fl_Box {} {
+          label {Mietbeginn:}
+          xywh {26 184 80 16}
+        }
+        Fl_Input _pMietbeginn {
+          xywh {106 180 100 25} box PLASTIC_THIN_DOWN_BOX
+          class Fl_Input
+        }
+      }
+      Fl_Group {} {open
+        xywh {20 226 535 69} box BORDER_BOX color 52
+      } {
+        Fl_Button _pBtnRenditeOhneSteuer {
+          label {Rendite ohne Steuer/AfA berechnen}
+          xywh {26 233 239 23} box GTK_UP_BOX down_box GTK_DOWN_BOX
+        }
+        Fl_Button _pBtnRenditeMitSteuer {
+          label {Rendite mit Steuer/AfA berechnen}
+          xywh {26 264 239 23} box GTK_UP_BOX down_box GTK_DOWN_BOX
+        }
+        Fl_Output _pRenditeOhneSteuer {
+          label {%}
+          xywh {276 232 49 25} box PLASTIC_THIN_DOWN_BOX align 8
+        }
+        Fl_Output _pRenditeMitSteuer {
+          label {%}
+          xywh {276 263 49 25} box PLASTIC_THIN_DOWN_BOX align 8
+        }
+        Fl_Group _pDummy4 {open
+          xywh {345 232 205 45} resizable
+        } {}
+      }
+    }
+    Fl_Button _pBtnInListe {
+      label {Vertrag in Liste übernehmen} selected
+      xywh {10 319 255 23} box GTK_UP_BOX down_box GTK_DOWN_BOX
+    }
+    Fl_Button _pBtnVertragEdit {
+      label {Vertrag editieren} selected
+      xywh {310 319 255 23} box GTK_UP_BOX down_box GTK_DOWN_BOX deactivate
+    }
+    Fl_Group _pBottomGrp {open
+      xywh {10 350 555 180} box BORDER_BOX color 52 resizable
+    } {
+      Fl_Table _pTable {open
+        xywh {12 352 551 176} resizable
+        class Flx_Table
+      } {}
+    }
+  }
+  code {TableData data;
+data.addColumn( "Kunde" );
+data.addColumn( "Angebot" );
+data.addColumn( "Vertrag" );
+data.addColumn( "Verläng." );
+data.addColumn( "E-Preis" );
+data.addColumn( "Menge" );
+data.addColumn( "G-Preis" );
+data.addColumn( "E-Tg-Miete" );
+data.addColumn( "Mietbeginn" );
+data.addColumn( "G-Jahres-Miete" );
+data.addColumn( "Mietdauer" );
+data.addColumn( "Mietende" );
+data.addColumn( "AfA/Jahr" );
+data.addColumn( "E-Rückkaufswert" );
+_pTable->setTableData( data );} {}
+} 
