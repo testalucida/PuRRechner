@@ -14,9 +14,9 @@ class DialogModel {
 public:
     DialogModel();
     virtual ~DialogModel();
-    Vertraege &getVertraege() const;
+    VertraegeTableData &getVertraege() const;
 private:
-    Vertraege _vertraege;
+    VertraegeTableData _vertraege;
 };
 
 #endif	/* DIALOGMODEL_H */

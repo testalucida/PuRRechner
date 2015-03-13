@@ -23,7 +23,7 @@ public:
 private:
     MainWindow *_pWin;
     Calculator _calc;
-    Vertraege _vertraege;
+    VertraegeTableData _vertraegeTableData;
     SaveHandler _saveHandler;
 };
 

@@ -28,12 +28,16 @@ struct Vertrag {
     int JahreMietdauer;
     float Rueckkaufswert;
     float AfA;
+    float Veraeusserungsgewinn;
     MyDate Mietbeginn;
     MyDate Mietende;
     bool isEmpty() { return Kunde.getLength() == 0; }
 };
 
 typedef shared_ptr<Vertrag> VertragPtr;
+typedef std::vector<VertragPtr> VertragPtrVector;
+typedef std::shared_ptr<VertragPtrVector> VertragPtrVectorPtr;
+
 
 #endif	/* VERTRAG_H */
 

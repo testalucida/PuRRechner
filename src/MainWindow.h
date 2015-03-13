@@ -14,7 +14,7 @@
 #include <stdarg.h>
 #include "CalculationData.h"
 #include "Vertrag.h"
-#include "DepotWertCalculator.h"
+#include "DepotDataCalculator.h"
 
 namespace flx {
     class Flx_Group;
@@ -29,13 +29,16 @@ namespace flx {
     class Flx_Table;
     class Flx_DateChooser;
     struct ActionParm;
-}
+    struct ToolAction;
+}   
 
 namespace my {
     class MyDate;
 }
 
-class Vertraege;
+class Fl_Pixmap;
+
+class VertraegeTableData;
 
 class IRendite {
 public:
@@ -52,11 +55,12 @@ public:
     virtual ~MainWindow();
     virtual void setRenditeOhneAfA( float rendite );
     virtual void setRenditeMitAfA( float rendite );
-    void setVertraege( Vertraege &vertraege );
-    Vertraege &getVertraege() const;
-    void setDepotWert( DepotWert depotWert );
+    void setVertraege( VertraegeTableData &vertraege );
+    VertraegeTableData &getVertraege() const;
+    void setDepotData( DepotData depotData );
     void clear();
 private:
+    void onToolButtonSelected( flx::Flx_ToolBar &, flx::ToolAction & );
     void onBtnRenditePushed( flx::Flx_Button &, flx::ActionParm & );
     void onBtnSavePushed( flx::Flx_Button &, flx::ActionParm & );
     void onNumericInputChanged( flx::Flx_NumericInput &, flx::ActionParm & );
@@ -66,7 +70,8 @@ private:
     flx::Flx_Group & createContainerGroup( int x, int y, int w, int h );
     flx::Flx_Group &createCalculationGroup( int x, int y, int w, int h );
     flx::Flx_Group &createVertragGroup( int x, int y, int w, int h );
-    flx::Flx_Group &createBottomGroup( int x, int y, int w, int h );
+    flx::Flx_Group &createAlleVertraegeGroup( int x, int y, int w, int h );
+    flx::Flx_Group &createDepotGroup( int x, int y, int w, int h );
     Fl_Widget *createInput( int x, int y, int w, int kindInput, const char *lbl );
     int getTextLen( const char * ) const;
     void adjustX( int nWidgets, int left, ... );
@@ -77,6 +82,7 @@ private:
     int _yspacing, _xspacing;
     int _statusbarHeight, _toolbarHeight, _inputHeight;
     flx::Flx_ToolBar *_pToolBar;
+    Fl_Pixmap *_pAddPixmap, *_pDeletePixmap;
     flx::Flx_Group *_pStatusBar;
     flx::Flx_FloatInput *_pEinzelpreis;
     flx::Flx_IntInput *_pMenge;
@@ -108,6 +114,8 @@ private:
     flx::Flx_Table *_pTable;
     flx::Flx_Output *_pDepotZeitwert;
     flx::Flx_Output *_pDepotSummeRueckkauf;
+    flx::Flx_Output *_pAnzahlAktiveVertraege;
+    flx::Flx_Output *_pSumVeraeussGewinne;
 };
 
 #endif	/* MAINWINDOW_H */

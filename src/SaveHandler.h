@@ -10,18 +10,18 @@
 
 class MainWindow;
 class Vertrag;
-class Vertraege;
+class VertraegeTableData;
 
 class SaveHandler {
 public:
     SaveHandler();
     
-    void setVertraege( Vertraege & );
+    void setVertraege( VertraegeTableData & );
     void saveVertrag( MainWindow &, Vertrag & );
 
     virtual ~SaveHandler();
 private:
-    Vertraege *_pVertraege;
+    VertraegeTableData *_pVertraege;
 };
 
 #endif	/* SAVEHANDLER_H */

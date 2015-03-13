@@ -8,18 +8,34 @@
 #ifndef VERTRAEGE_H
 #define	VERTRAEGE_H
 
+#include "Vertrag.h"
+
 #include <my/TableData.h>
+#include <my/CharBuffer.h>
 
-class Vertrag;
+#include <vector>
+#include <memory>
+#include <map>
 
-class Vertraege : public my::TableData {
+class VertraegeTableData : public my::TableData {
 public:
-    Vertraege();
-//    void addVertrag( const Vertrag & );
+    VertraegeTableData();
 
-    virtual ~Vertraege();
+    /**
+     * Macht aus jeder Zeile dieses TableData-Objekts
+     * ein VertragPtr-Objekt und liefert alle Verträge
+     * in einem Vector von VertragPtr-Instanzen zurück.
+     * @return  VertragPtrVectorPtr
+     */
+    VertragPtrVectorPtr getVertraege() ;
+
+    virtual ~VertraegeTableData();
 private:
-
+    void buildHeaderIndexMapper();
+    VertragPtr createVertragFromRow( int row ) const;
+    int getColumnIndex( const char *pHeader ) const;
+private:
+    std::map<std::string, int> _headerIndexMapper;
 };
 
 #endif	/* VERTRAEGE_H */

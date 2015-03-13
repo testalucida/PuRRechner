@@ -14,7 +14,7 @@
 SaveHandler::SaveHandler( ) : _pVertraege( NULL ) {
 }
 
-void SaveHandler::setVertraege( Vertraege &vertraege ) {
+void SaveHandler::setVertraege( VertraegeTableData &vertraege ) {
     _pVertraege = &vertraege;
 }
 

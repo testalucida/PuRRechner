@@ -22,13 +22,15 @@ void ContainerIO::connect() {
     _mysql.connect( "root", "PundR", password );
 }
 
-Vertraege &ContainerIO::getVertraege( Vertraege& vertraege ) {
-    CharBuffer sql( "select vertrag, lfdnr, angebot, kunde, einzelpreis, menge " );
-    //                        0        1       2      3        4           5
-    sql.add( ", tagesmiete, jahremietdauer, mietbeginn, mietende, rueckkauf, afa " );
-    //           6              7             8          9         10       11
+VertraegeTableData &ContainerIO::getVertraege( VertraegeTableData& vertraege ) {
+    CharBuffer sql( "select vertrag, lfdnr, angebot, kunde, einzelpreis, menge, einzelpreis * menge as gesamtpreis " );
+    //                        0        1       2      3        4           5                                6
+    sql.add( ", tagesmiete, jahremietdauer, mietbeginn, mietende, rueckkauf, rueckkauf * menge as gesamtrueckkauf " );
+    //             7             8             9           10       11                                   12                 
+    sql.add( ", rueckkauf*menge - ((menge*einzelpreis*afa*jahremietdauer)/100) as veraeussgewinn, afa " );
+    //                                                                                13          14
     sql.add( "from Container order by mietende desc, vertrag, lfdnr" );
-    //TableData data;
+    
     _mysql.select( sql.get(), vertraege );
     
     return vertraege;

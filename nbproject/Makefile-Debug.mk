@@ -38,7 +38,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/2110116603/Application.o \
 	${OBJECTDIR}/_ext/2110116603/Calculator.o \
 	${OBJECTDIR}/_ext/2110116603/ContainerIO.o \
-	${OBJECTDIR}/_ext/2110116603/DepotWertCalculator.o \
+	${OBJECTDIR}/_ext/2110116603/DepotDataCalculator.o \
 	${OBJECTDIR}/_ext/2110116603/DialogModel.o \
 	${OBJECTDIR}/_ext/2110116603/MainWindow.o \
 	${OBJECTDIR}/_ext/2110116603/MySql.o \
@@ -86,10 +86,10 @@ ${OBJECTDIR}/_ext/2110116603/ContainerIO.o: /home/max/cpp/fltk/PuRRechner/src/Co
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/home/max/cpp/fltk/PuRRechner/src -I/home/max/cpp/My_1_5 -I/home/max/cpp/fltk/Flx_1 -I/home/max/cpp/fltk-1.3.2 -I/usr/include/mysql -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/2110116603/ContainerIO.o /home/max/cpp/fltk/PuRRechner/src/ContainerIO.cpp
 
-${OBJECTDIR}/_ext/2110116603/DepotWertCalculator.o: /home/max/cpp/fltk/PuRRechner/src/DepotWertCalculator.cpp 
+${OBJECTDIR}/_ext/2110116603/DepotDataCalculator.o: /home/max/cpp/fltk/PuRRechner/src/DepotDataCalculator.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/2110116603
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/home/max/cpp/fltk/PuRRechner/src -I/home/max/cpp/My_1_5 -I/home/max/cpp/fltk/Flx_1 -I/home/max/cpp/fltk-1.3.2 -I/usr/include/mysql -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/2110116603/DepotWertCalculator.o /home/max/cpp/fltk/PuRRechner/src/DepotWertCalculator.cpp
+	$(COMPILE.cc) -g -I/home/max/cpp/fltk/PuRRechner/src -I/home/max/cpp/My_1_5 -I/home/max/cpp/fltk/Flx_1 -I/home/max/cpp/fltk-1.3.2 -I/usr/include/mysql -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/2110116603/DepotDataCalculator.o /home/max/cpp/fltk/PuRRechner/src/DepotDataCalculator.cpp
 
 ${OBJECTDIR}/_ext/2110116603/DialogModel.o: /home/max/cpp/fltk/PuRRechner/src/DialogModel.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/2110116603

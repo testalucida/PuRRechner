@@ -7,6 +7,10 @@
 
 #include "MainWindow.h"
 #include "Vertrag.h"
+#include "../images/add.xpm"
+#include "../images/add_deact.xpm"
+#include "../images/delete.xpm"
+#include "../images/delete_deact.xpm"
 
 #include <flx/Flx_Group.h>
 #include <flx/Flx_Choice.h>
@@ -24,6 +28,7 @@
 #include <FL/Fl_Widget.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl.H>
+#include <FL/Fl_Pixmap.H>
 
 #include <my/datetimecalculator.h>
 #include <FL/Fl_Input_.H>
@@ -43,7 +48,7 @@ enum KindOfInput {
 };
 
 MainWindow::MainWindow( int x, int y ) 
-: Flx_Window( x, y, 800, 700, "Container Kalkulation und Verwaltung" )
+: Flx_Window( x, y, 1100, 850, "Container Kalkulation und Verwaltung" )
 , _yspacing( 10 )
 , _xspacing( 10 )
 , _statusbarHeight( 25 )
@@ -51,15 +56,24 @@ MainWindow::MainWindow( int x, int y )
 , _inputHeight( 21 )
 {
     _pToolBar = new Flx_ToolBar( 0, 0, w(), _toolbarHeight );
-    //add( _pToolBar );
+    _pToolBar->addButton( NULL, NULL, "" ).deactivate(); //Dummy wg. Abstand zum Rand
+    _pToolBar->addButton( add_xpm, add_deact_xpm, "Neuen Vertrag anlegen" ).deactivate();
+    _pToolBar->addButton( delete_xpm, delete_deact_xpm, "Vertrag löschen" ).deactivate();
+    _pToolBar->signalToolButtonSelected.connect<MainWindow, &MainWindow::onToolButtonSelected>( this );
+    
     Flx_Group &contGrp = createTopGroup();
-    Flx_Group &botGrp = createBottomGroup( contGrp.x(), contGrp.y() + contGrp.h() + _yspacing,
-                       contGrp.w(), this->h() - contGrp.y() - contGrp.h() - 2*_yspacing );
+    
+    Flx_Group &vertrGrp  = createAlleVertraegeGroup( contGrp.x(), contGrp.y() + contGrp.h() + _yspacing, 
+                                                    contGrp.w(), 220 );
+    
+    int H = this->h() - vertrGrp.y() - vertrGrp.h() - 3*_yspacing;
+    Flx_Group &depotGrp = createDepotGroup( vertrGrp.x(), vertrGrp.y() + vertrGrp.h() + _yspacing, vertrGrp.w(), H );
+
     end();
-    resizable( botGrp );
+    resizable( vertrGrp );
     
     _pLaufzeit->value( "5" );
-    _pAfa->value( 12.5 );
+    _pAfa->value( 10.0 );
     _pSteuersatz->value( 30.0 );
     _pLfdNr->value( "0" );
     _pKunde->value( "M" );
@@ -257,8 +271,8 @@ Fl_Widget *MainWindow::createInput( int x, int y, int w, int kindInput, const ch
     //p->box( FL_FLAT_BOX );
     return p;
 }
-
- Flx_Group &MainWindow::createBottomGroup( int x, int y, int w, int h ) {
+ 
+ flx::Flx_Group &MainWindow::createAlleVertraegeGroup( int x, int y, int w, int h ) {
     Flx_Group *pGrp  = new Flx_Group( x, y, w, h, "Vertragsbestand" );
     pGrp->box(FL_BORDER_BOX);
     pGrp->color(FL_LIGHT2);
@@ -267,7 +281,7 @@ Fl_Widget *MainWindow::createInput( int x, int y, int w, int kindInput, const ch
     pGrp->align( Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE ) );
 
     _pTable = new Flx_Table( x + _xspacing, y + _yspacing + 10, 
-                            w - 2*_xspacing, h - 2*_yspacing - 50 );
+                            w - 2*_xspacing, h - 2*_yspacing - 10 ); //- 50 );
     _pTable->box(FL_THIN_DOWN_FRAME);
     _pTable->color(FL_LIGHT2);
     _pTable->selection_color(FL_BACKGROUND_COLOR);
@@ -279,27 +293,45 @@ Fl_Widget *MainWindow::createInput( int x, int y, int w, int kindInput, const ch
     _pTable->align(Fl_Align(FL_ALIGN_TOP));
     //_pTable->when(FL_WHEN_RELEASE);
     _pTable->setSelectionMode( FLX_SELECTION_SINGLEROW );
+    _pTable->setSortable( true );
     
-    _pDepotZeitwert = new Flx_Output( _pTable->x(), 
-                                      _pTable->y() + _pTable->h() + _yspacing, 
-                                      55, 25, "Zeitwert des Depots " );
-   
-    _pDepotZeitwert->textfont( FL_HELVETICA_BOLD );
-    _pDepotZeitwert->align( FL_ALIGN_RIGHT );
-    
-    _pDepotSummeRueckkauf = new Flx_Output( _pDepotZeitwert->x() + 200,
-                                            _pDepotZeitwert->y(), 
-                                            55, 25, "Summe d. Rückkaufswerte (stpfl. ab Kauf 2009)" );
-    _pDepotSummeRueckkauf->textfont( FL_HELVETICA_BOLD );
-    _pDepotSummeRueckkauf->align( FL_ALIGN_RIGHT );
-            
-    
-     pGrp->end();
-     pGrp->resizable( _pTable );
-     return *pGrp;
+    return *pGrp;
  }
 
-int MainWindow::getTextLen( const char *txt ) const {
+flx::Flx_Group &MainWindow::createDepotGroup( int x, int y, int w, int h ) {
+    Flx_Group *pGrp  = new Flx_Group( x, y, w, h, "Depot" );
+    pGrp->box(FL_BORDER_BOX);
+    pGrp->color(FL_LIGHT2);
+    pGrp->labeltype( FL_EMBOSSED_LABEL );
+    pGrp->labelfont( 2 );
+    pGrp->align( Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE ) );
+    
+    _pAnzahlAktiveVertraege = new Flx_Output( x + 175, 
+                                      y + 2*_yspacing, 
+                                      25, 25, "Aktive Verträge im Depot" );
+    _pAnzahlAktiveVertraege->value( "0" );
+    
+    _pDepotZeitwert = new Flx_Output( _pAnzahlAktiveVertraege->x(), 
+                                      _pAnzahlAktiveVertraege->y() + _pAnzahlAktiveVertraege->h() + _yspacing, 
+                                      55, 25, "Zeitwert des Depots" );
+    _pDepotZeitwert->textfont( FL_HELVETICA_BOLD );
+    
+    
+    _pDepotSummeRueckkauf = new Flx_Output( _pDepotZeitwert->x(),
+                                            _pDepotZeitwert->y() + _pDepotZeitwert->h() + _yspacing, 
+                                            55, 25, "Summe d. Rückkaufswerte" );
+   _pDepotSummeRueckkauf->textfont( FL_HELVETICA_BOLD );
+
+    
+    _pSumVeraeussGewinne = new Flx_Output( _pDepotSummeRueckkauf->x(),
+                                           _pDepotSummeRueckkauf->y() + _pDepotSummeRueckkauf->h() + _yspacing, 
+                                           55, 25, "Summe d. Veräuß.gewinne" );
+    _pSumVeraeussGewinne->textfont( FL_HELVETICA_BOLD );
+    
+    return *pGrp;
+}
+ 
+ int MainWindow::getTextLen( const char *txt ) const {
     int w=0, h=0;
     fl_measure( txt, w, h, 0 );
     return w;
@@ -321,6 +353,10 @@ void MainWindow::adjustX( int nWidgets, int left, ... ) {
     }
     
     va_end( list );
+}
+
+void MainWindow::onToolButtonSelected( Flx_ToolBar &tb, ToolAction &action ) {
+    
 }
 
 void MainWindow::onBtnRenditePushed( flx::Flx_Button &, flx::ActionParm & ) {
@@ -424,19 +460,27 @@ void MainWindow::setRenditeMitAfA( float rendite ) {
     _pRenditeMit->value( buf );
 }
 
-void MainWindow::setVertraege( Vertraege &vertraege ) {
+void MainWindow::setVertraege( VertraegeTableData &vertraege ) {
     _pTable->setTableData( (TableData&)vertraege );
 }
 
-Vertraege &MainWindow::getVertraege() const {
-    return (Vertraege&)_pTable->getTableData();
+VertraegeTableData &MainWindow::getVertraege() const {
+    return (VertraegeTableData&)_pTable->getTableData();
 }
 
-void MainWindow::setDepotWert( DepotWert depotWert ) {
-    string wert;
-    _pDepotZeitwert->value( Convert::toString( depotWert.DepotwertHeute, wert ).c_str() );
-    wert.clear();
-    _pDepotSummeRueckkauf->value( Convert::toString( depotWert.SummeRueckkaufwerte, wert ).c_str() ); 
+void MainWindow::setDepotData( DepotData depotData ) {
+    _pAnzahlAktiveVertraege->
+        value( std::to_string( depotData.AnzahlAktiveVertraege ).c_str() );
+    
+    _pDepotZeitwert->
+        value( to_string( depotData.DepotwertHeute ).c_str() );
+   
+    _pDepotSummeRueckkauf->
+        value( to_string( depotData.SummeRueckkaufwerte ).c_str() ); 
+    
+    _pSumVeraeussGewinne->
+        value( to_string( depotData.SummeVeraeussGewinne ).c_str() );
+   
 }
 
 void MainWindow::clear() {

@@ -8,18 +8,18 @@
 #include "Application.h"
 #include "MainWindow.h"
 #include "ContainerIO.h"
-#include "DepotWertCalculator.h"
+#include "DepotDataCalculator.h"
 
 #include <FL/Fl.H>
 
 Application::Application( ) {
     Fl::scheme( "GTK+" );
-    _pWin = new MainWindow( 100, 100 );
+    _pWin = new MainWindow( 100, 20 );
     
     _pWin->signalCalculateRendite.
         connect< Calculator, &Calculator::onCalculate >( &_calc );
     
-    _saveHandler.setVertraege( _vertraege );
+    _saveHandler.setVertraege( _vertraegeTableData );
     
     _pWin->signalSaveVertrag.
         connect< SaveHandler, &SaveHandler::saveVertrag >( &_saveHandler );
@@ -28,10 +28,10 @@ Application::Application( ) {
 void Application::init() {
     ContainerIO io;
     io.connect();
-    _pWin->setVertraege( io.getVertraege( _vertraege ) );
-    DepotWertCalculator wertCalc;
-    DepotWert wert = wertCalc.getDepotWert();
-    _pWin->setDepotWert( wert );
+    _pWin->setVertraege( io.getVertraege( _vertraegeTableData ) );
+    DepotDataCalculator wertCalc( _vertraegeTableData.getVertraege() );
+    DepotData wert = wertCalc.getDepotData();
+    _pWin->setDepotData( wert );
 }
 
 MainWindow &Application::getWindow() const {

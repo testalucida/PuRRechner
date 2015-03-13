@@ -14,7 +14,7 @@
 
 #include <vector>
 
-class Vertraege;
+class VertraegeTableData;
 
 class ContainerIO {
 public:
@@ -31,7 +31,7 @@ public:
      * @param vertraege: Referenz auf das zu füllende
      * Vertraege-Objekt
      */
-    Vertraege &getVertraege( Vertraege &vertraege );
+    VertraegeTableData &getVertraege( VertraegeTableData &vertraege );
   
     /**
      * Fügt einen Vertrag in die Tabelle Container ein.
