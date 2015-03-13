@@ -67,7 +67,13 @@ MainWindow::MainWindow( int x, int y )
                                                     contGrp.w(), 220 );
     
     int H = this->h() - vertrGrp.y() - vertrGrp.h() - 3*_yspacing;
-    Flx_Group &depotGrp = createDepotGroup( vertrGrp.x(), vertrGrp.y() + vertrGrp.h() + _yspacing, vertrGrp.w(), H );
+    Flx_Group &depotGrp = createDepotGroup( vertrGrp.x(), vertrGrp.y() + vertrGrp.h() + _yspacing, 
+                                            vertrGrp.w()/2, H );
+    
+    Flx_Group &steuerGrp = createSteuerGroup( depotGrp.x() + depotGrp.w() + _xspacing, 
+                                              depotGrp.y(), 
+                                              w() - depotGrp.w() - 3*_xspacing, 
+                                              depotGrp.h() );
 
     end();
     resizable( vertrGrp );
@@ -295,6 +301,8 @@ Fl_Widget *MainWindow::createInput( int x, int y, int w, int kindInput, const ch
     _pTable->setSelectionMode( FLX_SELECTION_SINGLEROW );
     _pTable->setSortable( true );
     
+    pGrp->end();
+    
     return *pGrp;
  }
 
@@ -328,9 +336,35 @@ flx::Flx_Group &MainWindow::createDepotGroup( int x, int y, int w, int h ) {
                                            55, 25, "Summe d. Veräuß.gewinne" );
     _pSumVeraeussGewinne->textfont( FL_HELVETICA_BOLD );
     
+    pGrp->end();
+    
     return *pGrp;
 }
  
+flx::Flx_Group &MainWindow::createSteuerGroup( int x, int y, int w, int h ) {
+    Flx_Group *pGrp  = new Flx_Group( x, y, w, h, "Steuerliche Auswirkungen" );
+    pGrp->box(FL_BORDER_BOX);
+    pGrp->color(FL_LIGHT2);
+    pGrp->labeltype( FL_EMBOSSED_LABEL );
+    pGrp->labelfont( 2 );
+    pGrp->align( Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE ) );
+    
+    _pJahrAuswahl = new Flx_Choice( x + 125, y + 2*_yspacing, 75, 25, "Veranlagungsjahr" );
+    _pJahrAuswahl->color( FL_WHITE );
+    
+    _pSteuersatz2 = new Flx_IntInput( _pJahrAuswahl->x() + _pJahrAuswahl->w() + 100,
+                                  _pJahrAuswahl->y(), 30, 25, "Steuersatz (%)" );
+    _pSteuersatz2->value( "30" );
+
+    int Y = _pJahrAuswahl->y() + _pJahrAuswahl->h() + _yspacing;
+    _pSteuerTable = new Flx_Table( x + _xspacing, Y,
+                                   w - 2*_xspacing, 
+                                   y + h - Y - _yspacing );
+    
+    return *pGrp;
+}
+
+
  int MainWindow::getTextLen( const char *txt ) const {
     int w=0, h=0;
     fl_measure( txt, w, h, 0 );
@@ -481,6 +515,13 @@ void MainWindow::setDepotData( DepotData depotData ) {
     _pSumVeraeussGewinne->
         value( to_string( depotData.SummeVeraeussGewinne ).c_str() );
    
+}
+
+void MainWindow::setVeranlagungsjahre( std::vector<int> &jahre ) {
+    for( auto j : jahre ) {
+        _pJahrAuswahl->add( to_string( j ).c_str() );
+    }
+    _pJahrAuswahl->value( 0 );
 }
 
 void MainWindow::clear() {

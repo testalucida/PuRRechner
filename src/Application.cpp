@@ -32,6 +32,9 @@ void Application::init() {
     DepotDataCalculator wertCalc( _vertraegeTableData.getVertraege() );
     DepotData wert = wertCalc.getDepotData();
     _pWin->setDepotData( wert );
+    std::vector<int> jahre( {2014, 2015, 2016, 2017, 2018});
+    _pWin->setVeranlagungsjahre( jahre );
+    
 }
 
 MainWindow &Application::getWindow() const {

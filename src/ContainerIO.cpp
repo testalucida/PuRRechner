@@ -126,40 +126,40 @@ void ContainerIO::updateVertrag( const Vertrag &vertrag ) {
     _mysql.exec( sql.get() );
 }
 
- WertverlustVectorPtr ContainerIO::getWertverluste() {
-    CharBuffer sql( "SELECT vertrag, lfdnr, mietbeginn, mietende, " );
-    //                         0       1        2          3
-    sql.add( "einzelpreis * menge as kaufpreis, rueckkauf * menge as rueckkauf, " )
-    //                                4                              5
-       .add( "((einzelpreis * menge - rueckkauf * menge)/(jahremietdauer*365)) as wertverlustprotag, " )
-    //                                                                                  6
-       .add( "datediff(mietende, current_date) as tagerestlaufzeit " )
-    //                                                  7
-       .add( "FROM Container " )
-       .add( "where mietbeginn <= curdate() and mietende >= curdate()" );
-       
-	TableData data;
-    _mysql.select( sql.get(), data );
-    
-     WertverlustVectorPtr pListe( new vector<WertverlustDataPtr>() );
-     
-     for( int r = 0, rmax = data.getRowCount(); r < rmax; r++ ) {
-         
-         WertverlustDataPtr pWv( new WertverlustData() );
-         pWv->Vertrag.add( data.getValue( r, 0 ) );
-         pWv->LfdNr = data.getIntValue( r, 1 );
-         pWv->Mietbeginn.FromIsoString( data.getValue( r, 2 ) );
-         pWv->Mietende.FromIsoString( data.getValue( r, 3 ) );
-         pWv->Kaufpreis = data.getIntValue( r, 4 );
-         pWv->Rueckkauf = data.getIntValue( r, 5 );
-         pWv->WertverlustProTag = data.getFloatValue( r, 6 );
-         pWv->TageRestlaufzeit = data.getIntValue( r, 7 );
-         
-         pListe->push_back( pWv );
-     }
-     
-     return pListe;
- }
+// WertverlustVectorPtr ContainerIO::getWertverluste() {
+//    CharBuffer sql( "SELECT vertrag, lfdnr, mietbeginn, mietende, " );
+//    //                         0       1        2          3
+//    sql.add( "einzelpreis * menge as kaufpreis, rueckkauf * menge as rueckkauf, " )
+//    //                                4                              5
+//       .add( "((einzelpreis * menge - rueckkauf * menge)/(jahremietdauer*365)) as wertverlustprotag, " )
+//    //                                                                                  6
+//       .add( "datediff(mietende, current_date) as tagerestlaufzeit " )
+//    //                                                  7
+//       .add( "FROM Container " )
+//       .add( "where mietbeginn <= curdate() and mietende >= curdate()" );
+//       
+//	TableData data;
+//    _mysql.select( sql.get(), data );
+//    
+//     WertverlustVectorPtr pListe( new vector<WertverlustDataPtr>() );
+//     
+//     for( int r = 0, rmax = data.getRowCount(); r < rmax; r++ ) {
+//         
+//         WertverlustDataPtr pWv( new WertverlustData() );
+//         pWv->Vertrag.add( data.getValue( r, 0 ) );
+//         pWv->LfdNr = data.getIntValue( r, 1 );
+//         pWv->Mietbeginn.FromIsoString( data.getValue( r, 2 ) );
+//         pWv->Mietende.FromIsoString( data.getValue( r, 3 ) );
+//         pWv->Kaufpreis = data.getIntValue( r, 4 );
+//         pWv->Rueckkauf = data.getIntValue( r, 5 );
+//         pWv->WertverlustProTag = data.getFloatValue( r, 6 );
+//         pWv->TageRestlaufzeit = data.getIntValue( r, 7 );
+//         
+//         pListe->push_back( pWv );
+//     }
+//     
+//     return pListe;
+// }
 
 ContainerIO::~ContainerIO( ) {
     _mysql.disconnect();

@@ -27,7 +27,7 @@ namespace flx {
     class Flx_DateChooser;
     class Flx_Button;
     class Flx_Table;
-    class Flx_DateChooser;
+    class Flx_Choice;
     struct ActionParm;
     struct ToolAction;
 }   
@@ -58,6 +58,7 @@ public:
     void setVertraege( VertraegeTableData &vertraege );
     VertraegeTableData &getVertraege() const;
     void setDepotData( DepotData depotData );
+    void setVeranlagungsjahre( std::vector<int> &jahre );
     void clear();
 private:
     void onToolButtonSelected( flx::Flx_ToolBar &, flx::ToolAction & );
@@ -72,6 +73,7 @@ private:
     flx::Flx_Group &createVertragGroup( int x, int y, int w, int h );
     flx::Flx_Group &createAlleVertraegeGroup( int x, int y, int w, int h );
     flx::Flx_Group &createDepotGroup( int x, int y, int w, int h );
+    flx::Flx_Group &createSteuerGroup( int x, int y, int w, int h );
     Fl_Widget *createInput( int x, int y, int w, int kindInput, const char *lbl );
     int getTextLen( const char * ) const;
     void adjustX( int nWidgets, int left, ... );
@@ -116,6 +118,9 @@ private:
     flx::Flx_Output *_pDepotSummeRueckkauf;
     flx::Flx_Output *_pAnzahlAktiveVertraege;
     flx::Flx_Output *_pSumVeraeussGewinne;
+    flx::Flx_Choice *_pJahrAuswahl;
+    flx::Flx_IntInput *_pSteuersatz2;
+    flx::Flx_Table *_pSteuerTable;
 };
 
 #endif	/* MAINWINDOW_H */

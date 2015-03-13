@@ -62,7 +62,7 @@ public:
      * Ein Eintrag entspricht dem Wertverlust eines Vertrags.
      * @return 
      */
-    WertverlustVectorPtr getWertverluste();
+    //WertverlustVectorPtr getWertverluste();
     
 private:
     MySql _mysql;
