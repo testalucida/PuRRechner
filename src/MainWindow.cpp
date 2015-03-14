@@ -6,7 +6,12 @@
  */
 
 #include "MainWindow.h"
-#include "Vertrag.h"
+#include "Vertraege.h"
+//#include "../images/new3.xpm"
+//#include "../images/new3_deact.xpm"
+#include "../images/new4.xpm"
+#include "../images/edit.xpm"
+#include "../images/edit_deact.xpm"
 #include "../images/save.xpm"
 #include "../images/save_deact.xpm"
 #include "../images/rubbish.xpm"  
@@ -34,6 +39,7 @@
 #include <FL/Fl_Input_.H>
 #include <my/datetime.h>
 #include <my/convert.h>
+#include <flx/Flx_Message.h>
 
 
 using namespace flx;
@@ -54,11 +60,18 @@ MainWindow::MainWindow( int x, int y )
 , _statusbarHeight( 25 )
 , _toolbarHeight( 30 )
 , _inputHeight( 21 )
+, _isDirty( false )
+, _isEditMode( false )
 {
     _pToolBar = new Flx_ToolBar( 0, 0, w(), _toolbarHeight );
     _pToolBar->addButton( NULL, NULL, "" ).deactivate(); //Dummy wg. Abstand zum Rand
+    _pBtnNew = &( _pToolBar->addButton( new4_xpm, new4_xpm, "Eingabefelder leeren, um neuen Vertrag zu erfassen" ) );
+    _pBtnEdit = &( _pToolBar->addButton( edit_xpm, edit_deact_xpm, "Ausgewählten Vertrag ändern" ) );
+    _pBtnEdit->deactivate();
+    _pToolBar->addSeparator();
     _pBtnSave = &( _pToolBar->addButton( save_xpm, save_deact_xpm, "Vertrag speichern" ) );
     _pBtnSave->deactivate();
+    _pToolBar->addSeparator();
     _pBtnDelete = &( _pToolBar->addButton( rubbish_xpm, rubbish_deact_xpm, "Vertrag löschen" ) );
     _pBtnDelete->deactivate();
     _pToolBar->signalToolButtonSelected.connect<MainWindow, &MainWindow::onToolButtonSelected>( this );
@@ -90,6 +103,7 @@ MainWindow::MainWindow( int x, int y )
     _pSteuersatz->value( 30.0 );
     _pLfdNr->value( "0" );
     _pKunde->value( "M" );
+   
     
       //TEST
 //    _pEinzelpreis->value( 3380 );
@@ -140,36 +154,6 @@ Flx_Group &MainWindow::createTopGroup() {
     pTopGrp->end();
     return *pTopGrp;
 }
-
-//Flx_Group &MainWindow::createContainerGroup( int x, int y, int w, int h ) {
-//    Flx_Group *p = new Flx_Group( x, y, w, h, "Container" );
-//    p->box( FL_BORDER_BOX );
-//    p->color( FL_LIGHT2 );
-//    p->labeltype( FL_EMBOSSED_LABEL );
-//    p->labelfont( 2 );
-//    p->align( Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE ) );
-//    
-//    ////////// Einzelpreis
-//    int X = x + 110;
-//    int Y = y + 2*_yspacing;
-//    _pEinzelpreis = (Flx_FloatInput*)createInput( X, Y, 60, INPUT_FLOAT, "Einzelpreis: " );
-//    
-//    ////////// Miete pro Tag
-//    X = _pEinzelpreis->x() + _pEinzelpreis->w() + 150;
-//    _pMieteContTag = (Flx_FloatInput*)createInput( X, Y, 60, INPUT_FLOAT, "Miete/Cont/Tag: " );
-//    
-//    ///////// Laufzeit
-//    X = _pMieteContTag->x() + _pMieteContTag->w() + 150;
-//    _pLaufzeit = (Flx_IntInput*)createInput( X, Y, 30, INPUT_INT, "Laufzeit (Jahre): " );
-//    
-//    ///////// Rückkaufswert
-//    X = _pLaufzeit->x() + _pLaufzeit->w()  + 110;
-//    _pRueckkauf = (Flx_FloatInput*)createInput( X, Y, 60, INPUT_FLOAT, "Rückkauf: " );
-//
-//    p->end();
-//
-//    return *p;
-//}
 
 Flx_Group &MainWindow::createContainerGroup( int x, int y, int w, int h ) {
     Flx_Group *p = new Flx_Group( x, y, w, h, "Container" );
@@ -430,7 +414,6 @@ flx::Flx_Group &MainWindow::createSteuerGroup( int x, int y, int w, int h ) {
     return *pGrp;
 }
 
-
  int MainWindow::getTextLen( const char *txt ) const {
     int w=0, h=0;
     fl_measure( txt, w, h, 0 );
@@ -456,7 +439,76 @@ void MainWindow::adjustX( int nWidgets, int left, ... ) {
 }
 
 void MainWindow::onToolButtonSelected( Flx_ToolBar &tb, ToolAction &action ) {
+    if( action.pSelectedButton == _pBtnDelete ) {
+        VertragPtr pV = getVertragFromSelectedRow();
+        CharBuffer msg;
+        msg.add( "Möchten Sie den Vertrag\n\n\t" ).add( pV->Vertrag )
+           .add( "\n\nwirklich löschen?" );
+        if( Flx_Message::ask( "ACHTUNG - Löschen ist endgültig", msg.get() ) ) {
+            
+        }
+    } else if( action.pSelectedButton == _pBtnSave ) {
+        sendSaveSignal();
+    } else if( action.pSelectedButton == _pBtnNew ) {
+        startNewMode();
+    } else if( action.pSelectedButton == _pBtnEdit ) {
+        startEditMode();
+    }
+}
+
+VertragPtr MainWindow::getVertragFromSelectedRow() const {
+    int sel = _pTable->getSelectedRows()[0];
     
+    VertraegeTableData &vertraege =  
+            static_cast<VertraegeTableData &>(_pTable->getTableData() );
+    
+    VertragPtr pV = vertraege.getVertrag( sel );
+    
+    return pV;
+}
+
+void MainWindow::startNewMode() {
+    if( _isEditMode && _isDirty ) {
+        //wir sind im Änderungsmodus und haben auch etwas geändert.
+        //SOllen diese Änderungen verworfen werden?
+        CharBuffer q;
+        q.add( "Es gibt nicht gespeicherte Änderungen.\n\n" )
+         .add( "Diese Änderungen verwerfen?\n" );
+         
+        int rc = Flx_Message::ask( "Änderungen verwerfen?", q.get() );
+        if( rc < 1 ) {
+            return;
+        }
+    }
+    clearInputFields();
+    enableInputFields( true );
+    _pBtnEdit->deactivate();
+    _pBtnDelete->deactivate();
+    _isEditMode = true;
+}
+
+void MainWindow::startEditMode() {
+    enableInputFields( true );
+    _pBtnEdit->activate();
+    _isEditMode = true;
+}
+
+void MainWindow::clearInputFields() {
+    _pEinzelpreis->value( 0.0 );
+    _pMieteContTag->value( 0.0 );
+    _pRueckkauf->value( 0.0 );
+    _pRenditeMit->value( "" );
+    _pRenditeOhne->value( "" );
+    _pAngebot->value( "" );
+    _pVertrag->value( "" );
+    _pLfdNr->value( "0" );
+    _pAnzahl->value( "" );
+    _pEinzelpreis->take_focus();
+    MyDate today( true );
+    _pMietbeginn->setDate( today );
+    MyDate mietende( today );
+    DateTimeCalculator::ComputeYears( mietende, 5 );
+    _pMietende->value( mietende.ToEurString().c_str() );
 }
 
 void MainWindow::onBtnRenditePushed( flx::Flx_Button &, flx::ActionParm & ) {
@@ -466,19 +518,17 @@ void MainWindow::onBtnRenditePushed( flx::Flx_Button &, flx::ActionParm & ) {
     calcData.MieteProTag = _pMieteContTag->floatValue();
     calcData.Rueckkaufpreis = _pRueckkauf->floatValue();
     calcData.AfA = Convert::toFloat( _pAfaChoice->text() );
-    //calcData.AfA = _pAfa->floatValue();
     calcData.Steuersatz = _pSteuersatz->floatValue();
     signalCalculateRendite.send( this, &calcData );
 }
 
-void MainWindow::onBtnSavePushed( flx::Flx_Button &, flx::ActionParm & ) {
+void MainWindow::sendSaveSignal() {
     Vertrag vertrag;
     vertrag.Einzelpreis = _pEinzelpreis->floatValue();
     vertrag.Tagesmiete = _pMieteContTag->floatValue();
     vertrag.JahreMietdauer = _pLaufzeit->intValue();
     vertrag.Rueckkaufswert = _pRueckkauf->floatValue();
     vertrag.AfA = Convert::toFloat( _pAfaChoice->text() );
-    //vertrag.AfA = _pAfa->floatValue();
     vertrag.Angebot.add( _pAngebot->value() );
     vertrag.Vertrag.add( _pVertrag->value() );
     vertrag.LfdNr = _pLfdNr->intValue();
@@ -488,10 +538,60 @@ void MainWindow::onBtnSavePushed( flx::Flx_Button &, flx::ActionParm & ) {
     vertrag.Mietende.FromEurString( _pMietende->value() );
     signalSaveVertrag.send( *this, vertrag );
     _pBtnSave->deactivate();
+    _isDirty = false;
 }
 
-void MainWindow::onVertraegeTableSelectionChanged( Flx_Table &, SelectionEvent &evt ) {
+void MainWindow::onVertraegeTableSelectionChanged( Flx_Table &, SelectionEvent & ) {
+    setInputFieldsFromTableRow();
+    enableInputFields( false );
     _pBtnDelete->activate();
+    _pBtnEdit->activate();
+    _pBtnSave->deactivate();
+    _isDirty = false;
+}
+
+void MainWindow::setInputFieldsFromTableRow() {
+    VertragPtr pV = getVertragFromSelectedRow();
+    _pEinzelpreis->value( pV->Einzelpreis );
+    _pMieteContTag->value( pV->Tagesmiete );
+    _pRueckkauf->value( pV->Rueckkaufswert );
+    _pAngebot->value( pV->Angebot.get() );
+    _pVertrag->value( pV->Vertrag.get() );
+    _pLfdNr->value( to_string( pV->LfdNr ).c_str() );
+    _pAnzahl->value( to_string( pV->Menge ).c_str() );
+    _pKunde->value( pV->Kunde.get() );
+    _pMietbeginn->setDate( pV->Mietbeginn );
+    _pMietende->value( pV->Mietende.ToEurString().c_str() );
+    
+    _pEinzelpreis->take_focus();
+}
+
+void MainWindow::enableInputFields( bool enable ) {
+    if( enable ) {
+        _pEinzelpreis->activate();
+        _pMieteContTag->activate();
+        _pRueckkauf->activate();
+        _pAngebot->activate();
+        _pVertrag->activate();
+        _pLfdNr->activate();
+        _pAnzahl->activate();
+        _pKunde->activate();
+        _pMietbeginn->activate();
+        _pMietende->activate();
+        _pLaufzeit->activate();
+    } else {
+        _pEinzelpreis->deactivate();
+        _pMieteContTag->deactivate();
+        _pRueckkauf->deactivate();
+        _pAngebot->deactivate();
+        _pVertrag->deactivate();
+        _pLfdNr->deactivate();
+        _pAnzahl->deactivate();
+        _pKunde->deactivate();
+        _pMietbeginn->deactivate();
+        _pMietende->deactivate();
+        _pLaufzeit->deactivate();
+    }
 }
 
 void MainWindow::onNumericInputChanged( flx::Flx_NumericInput &inp, flx::ActionParm & ) {
@@ -508,7 +608,7 @@ void MainWindow::onNumericInputChanged( flx::Flx_NumericInput &inp, flx::ActionP
             _pMietende->value( "" );            
         }
     }
-    
+    _isDirty = true;
     checkSaveButton();
 }
 
@@ -519,9 +619,11 @@ void MainWindow::onMietbeginnChanged( Flx_DateChooser &, my::MyDate &date ) {
         DateTimeCalculator::ComputeYears( ende, nJahre );
         _pMietende->const_value( ende.ToEurString() );
     }
+    _isDirty = true;
 }
 
 void MainWindow::onAlphaInputChanged( flx::Flx_Input &inp, flx::ActionParm & ) {
+    _isDirty = true;
     checkSaveButton();
 } 
 
@@ -543,17 +645,12 @@ bool MainWindow::canSave() const {
 }
 
 void MainWindow::checkSaveButton() {
-    if( canSave() ) {
+    if( canSave() && _isDirty ) {
         _pBtnSave->activate();
-        
     } else {
         _pBtnSave->deactivate();
     }
 }
-
-//void MainWindow::computeMietende( const my::MyDate &beginn, my::MyDate &ende ) {
-//    
-//}
 
 void MainWindow::setRenditeOhneAfA( float rendite ) {
     char buf[10];
@@ -599,16 +696,16 @@ void MainWindow::setVeranlagungsjahre( std::vector<int> &jahre ) {
     _pJahrAuswahl->value( 0 );
 }
 
-void MainWindow::clear() {
-    _pEinzelpreis->value( 0.00 );
-    _pAnzahl->value( "0" );
-    _pMieteContTag->value( 0.00 );
-    _pRueckkauf->value( 0.00 );
-    _pLfdNr->value( "0" );
-    _pAngebot->value( "" );
-    _pVertrag->value( "" );
-    _pKunde->value( "M" );
-}
+//void MainWindow::clear() {
+//    _pEinzelpreis->value( 0.00 );
+//    _pAnzahl->value( "0" );
+//    _pMieteContTag->value( 0.00 );
+//    _pRueckkauf->value( 0.00 );
+//    _pLfdNr->value( "0" );
+//    _pAngebot->value( "" );
+//    _pVertrag->value( "" );
+//    _pKunde->value( "M" );
+//}
 
 MainWindow::~MainWindow( ) {
 }

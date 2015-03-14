@@ -28,7 +28,15 @@ public:
      * @return  VertragPtrVectorPtr
      */
     VertragPtrVectorPtr getVertraege() ;
-
+    
+    /**
+     * Liefert ein VertragPtr-Objekt, das aus den Daten
+     * der TableData-Row mit dem Index idx erzeugt wird.
+     * @param idx Index der TableData-Row
+     * @return  VertragPtr
+     */
+    VertragPtr getVertrag( int idx ) const;
+    
     virtual ~VertraegeTableData();
 private:
     void buildHeaderIndexMapper();

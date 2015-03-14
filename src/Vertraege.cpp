@@ -29,6 +29,10 @@ VertragPtrVectorPtr VertraegeTableData::getVertraege() {
     return pVertragPtrVector;
 }
 
+VertragPtr VertraegeTableData::getVertrag( int idx ) const {
+    return createVertragFromRow( idx );
+}
+
 void VertraegeTableData::buildHeaderIndexMapper() {
     for( int c = 0, cmax = this->getColumnCount(); c < cmax; c++ ) {
         const char *pHeader = getColumnHeader( c );

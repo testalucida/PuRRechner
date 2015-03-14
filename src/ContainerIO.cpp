@@ -126,6 +126,13 @@ void ContainerIO::updateVertrag( const Vertrag &vertrag ) {
     _mysql.exec( sql.get() );
 }
 
+void ContainerIO::deleteVertrag( const char* vertrag ) {
+    CharBuffer sql( "delete from Container where vertrag = '" );
+    sql.add( vertrag ).add( "'" );
+    
+    _mysql.exec( vertrag );
+}
+
 // WertverlustVectorPtr ContainerIO::getWertverluste() {
 //    CharBuffer sql( "SELECT vertrag, lfdnr, mietbeginn, mietende, " );
 //    //                         0       1        2          3

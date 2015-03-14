@@ -58,6 +58,12 @@ public:
     void updateVertrag( const Vertrag &vertrag );
     
     /**
+     * Löscht einen Vertrag
+     * @param vertrag Vertragskennung, z.B. "GC 12345"
+     */
+    void deleteVertrag( const char* vertrag );
+    
+    /**
      * Liefert eine Liste aller Wertverluste.
      * Ein Eintrag entspricht dem Wertverlust eines Vertrags.
      * @return 

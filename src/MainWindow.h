@@ -61,11 +61,11 @@ public:
     VertraegeTableData &getVertraege() const;
     void setDepotData( DepotData depotData );
     void setVeranlagungsjahre( std::vector<int> &jahre );
-    void clear();
+//    void clear();
 private:
     void onToolButtonSelected( flx::Flx_ToolBar &, flx::ToolAction & );
     void onBtnRenditePushed( flx::Flx_Button &, flx::ActionParm & );
-    void onBtnSavePushed( flx::Flx_Button &, flx::ActionParm & );
+    void sendSaveSignal();
     void onVertraegeTableSelectionChanged( flx::Flx_Table &, flx::SelectionEvent & );
     void onNumericInputChanged( flx::Flx_NumericInput &, flx::ActionParm & );
     void onAlphaInputChanged( flx::Flx_Input &, flx::ActionParm & );
@@ -82,16 +82,26 @@ private:
     void adjustX( int nWidgets, int left, ... );
     bool canSave() const;
     void checkSaveButton();
-//    void computeMietende( const my::MyDate &, my::MyDate & );
+    VertragPtr getVertragFromSelectedRow() const;
+    void enableInputFields( bool enable );
+    /**
+     * leert die Eingabefelder, um die Erfassung eines neuen Vertrags
+     * zu ermöglichen
+     */
+    void startNewMode();
+    void startEditMode();
+    void clearInputFields();
+    void setInputFieldsFromTableRow();
 private:
     int _yspacing, _xspacing;
     int _statusbarHeight, _toolbarHeight, _inputHeight;
+    bool _isDirty, _isEditMode;
     flx::Flx_ToolBar *_pToolBar;
-    flx::Flx_ToolButton *_pBtnSave, *_pBtnDelete;
+    flx::Flx_ToolButton *_pBtnNew, *_pBtnEdit, *_pBtnSave, *_pBtnDelete;
     flx::Flx_Group *_pStatusBar;
     flx::Flx_FloatInput *_pEinzelpreis;
-    flx::Flx_IntInput *_pMenge;
-    flx::Flx_Output *_pGesamtpreis;
+//    flx::Flx_IntInput *_pMenge;
+//    flx::Flx_Output *_pGesamtpreis;
     flx::Flx_FloatInput *_pMieteContTag;
    
     flx::Flx_IntInput *_pLaufzeit;

@@ -30,7 +30,7 @@ void SaveHandler::saveVertrag( MainWindow &w, Vertrag &v ) {
         io.updateVertrag( v );
     }
     
-    w.clear();
+    //w.clear();
     
     if( _pVertraege ) {
         _pVertraege->clear();
