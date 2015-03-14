@@ -19,6 +19,7 @@
 namespace flx {
     class Flx_Group;
     class Flx_ToolBar;
+    class Flx_ToolButton;
     class Flx_NumericInput;
     class Flx_FloatInput;
     class Flx_IntInput;
@@ -30,6 +31,7 @@ namespace flx {
     class Flx_Choice;
     struct ActionParm;
     struct ToolAction;
+    struct SelectionEvent;
 }   
 
 namespace my {
@@ -64,6 +66,7 @@ private:
     void onToolButtonSelected( flx::Flx_ToolBar &, flx::ToolAction & );
     void onBtnRenditePushed( flx::Flx_Button &, flx::ActionParm & );
     void onBtnSavePushed( flx::Flx_Button &, flx::ActionParm & );
+    void onVertraegeTableSelectionChanged( flx::Flx_Table &, flx::SelectionEvent & );
     void onNumericInputChanged( flx::Flx_NumericInput &, flx::ActionParm & );
     void onAlphaInputChanged( flx::Flx_Input &, flx::ActionParm & );
     void onMietbeginnChanged( flx::Flx_DateChooser &, my::MyDate & );
@@ -84,7 +87,7 @@ private:
     int _yspacing, _xspacing;
     int _statusbarHeight, _toolbarHeight, _inputHeight;
     flx::Flx_ToolBar *_pToolBar;
-    Fl_Pixmap *_pAddPixmap, *_pDeletePixmap;
+    flx::Flx_ToolButton *_pBtnSave, *_pBtnDelete;
     flx::Flx_Group *_pStatusBar;
     flx::Flx_FloatInput *_pEinzelpreis;
     flx::Flx_IntInput *_pMenge;
@@ -94,7 +97,8 @@ private:
     flx::Flx_IntInput *_pLaufzeit;
     flx::Flx_FloatInput *_pRueckkauf;
     
-    flx::Flx_FloatInput *_pAfa;
+//    flx::Flx_FloatInput *_pAfa;
+    flx::Flx_Choice *_pAfaChoice;
     flx::Flx_FloatInput *_pSteuersatz;
     
     flx::Flx_Output *_pRenditeMit;
@@ -111,12 +115,13 @@ private:
     flx::Flx_Output *_pMietende;
     flx::Flx_IntInput *_pAnzahl;
     
-    flx::Flx_Button *_pBtnSave;
+    //flx::Flx_Button *_pBtnSave;
     
     flx::Flx_Table *_pTable;
+    flx::Flx_Output *_pAnzahlAktiveVertraege;
+    flx::Flx_Output *_pSummeInvest;
     flx::Flx_Output *_pDepotZeitwert;
     flx::Flx_Output *_pDepotSummeRueckkauf;
-    flx::Flx_Output *_pAnzahlAktiveVertraege;
     flx::Flx_Output *_pSumVeraeussGewinne;
     flx::Flx_Choice *_pJahrAuswahl;
     flx::Flx_IntInput *_pSteuersatz2;

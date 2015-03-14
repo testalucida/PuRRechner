@@ -11,12 +11,14 @@
 #include "Vertrag.h"
 
 struct DepotData {
-    DepotData() : DepotwertHeute(0)
+    DepotData() : AnzahlAktiveVertraege(0)
+                , SummeInvest( 0 )
+                , DepotwertHeute(0)
                 , SummeRueckkaufwerte(0)
-                , AnzahlAktiveVertraege(0)
                 , SummeVeraeussGewinne( 0 )
     {}
     int AnzahlAktiveVertraege;
+    int SummeInvest;
     int DepotwertHeute;
     int SummeRueckkaufwerte;
     int SummeVeraeussGewinne;

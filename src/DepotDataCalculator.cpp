@@ -24,6 +24,9 @@ DepotData DepotDataCalculator::getDepotData() const {
     for_each( _pVertraegeVector->begin(), _pVertraegeVector->end(), [&] (VertragPtr pV ) {
         //Nur aktive Verträge berücksichtigen:
         if( pV->Mietende > today ) {
+            //Ankäufe summieren:
+            depotData.SummeInvest += pV->Gesamtpreis;
+            
             //der heutige Depotwert ergibt sich aus der Summierung der einzelnen
             //Vertrags-Restwerte
             depotData.DepotwertHeute += getVertragsrestwert( pV );

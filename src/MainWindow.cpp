@@ -7,10 +7,10 @@
 
 #include "MainWindow.h"
 #include "Vertrag.h"
-#include "../images/add.xpm"
-#include "../images/add_deact.xpm"
-#include "../images/delete.xpm"
-#include "../images/delete_deact.xpm"
+#include "../images/save.xpm"
+#include "../images/save_deact.xpm"
+#include "../images/rubbish.xpm"  
+#include "../images/rubbish_deact.xpm"  
 
 #include <flx/Flx_Group.h>
 #include <flx/Flx_Choice.h>
@@ -52,23 +52,29 @@ MainWindow::MainWindow( int x, int y )
 , _yspacing( 10 )
 , _xspacing( 10 )
 , _statusbarHeight( 25 )
-, _toolbarHeight( 25 )
+, _toolbarHeight( 30 )
 , _inputHeight( 21 )
 {
     _pToolBar = new Flx_ToolBar( 0, 0, w(), _toolbarHeight );
     _pToolBar->addButton( NULL, NULL, "" ).deactivate(); //Dummy wg. Abstand zum Rand
-    _pToolBar->addButton( add_xpm, add_deact_xpm, "Neuen Vertrag anlegen" ).deactivate();
-    _pToolBar->addButton( delete_xpm, delete_deact_xpm, "Vertrag löschen" ).deactivate();
+    _pBtnSave = &( _pToolBar->addButton( save_xpm, save_deact_xpm, "Vertrag speichern" ) );
+    _pBtnSave->deactivate();
+    _pBtnDelete = &( _pToolBar->addButton( rubbish_xpm, rubbish_deact_xpm, "Vertrag löschen" ) );
+    _pBtnDelete->deactivate();
     _pToolBar->signalToolButtonSelected.connect<MainWindow, &MainWindow::onToolButtonSelected>( this );
     
     Flx_Group &contGrp = createTopGroup();
     
-    Flx_Group &vertrGrp  = createAlleVertraegeGroup( contGrp.x(), contGrp.y() + contGrp.h() + _yspacing, 
-                                                    contGrp.w(), 220 );
+    Flx_Group &vertrGrp  = 
+            createAlleVertraegeGroup( contGrp.x(), 
+                                      contGrp.y() + contGrp.h() + _yspacing, 
+                                      contGrp.w(), 
+                                      320 );
     
     int H = this->h() - vertrGrp.y() - vertrGrp.h() - 3*_yspacing;
     Flx_Group &depotGrp = createDepotGroup( vertrGrp.x(), vertrGrp.y() + vertrGrp.h() + _yspacing, 
-                                            vertrGrp.w()/2, H );
+                                            400, //vertrGrp.w()/2, 
+                                            H );
     
     Flx_Group &steuerGrp = createSteuerGroup( depotGrp.x() + depotGrp.w() + _xspacing, 
                                               depotGrp.y(), 
@@ -79,7 +85,8 @@ MainWindow::MainWindow( int x, int y )
     resizable( vertrGrp );
     
     _pLaufzeit->value( "5" );
-    _pAfa->value( 10.0 );
+    //->value( 10.0 );
+    _pAfaChoice->value( 0 );
     _pSteuersatz->value( 30.0 );
     _pLfdNr->value( "0" );
     _pKunde->value( "M" );
@@ -102,22 +109,67 @@ Flx_Group &MainWindow::createTopGroup() {
   
     Flx_Group *pTopGrp = new Flx_Group( _xspacing, _yspacing + _toolbarHeight, 
                                         w() - 2*_xspacing, 
-                                        370 /*380*/ );                                     
+                                        240 /*380*/ );                                     
     pTopGrp->box( FL_BORDER_BOX );
-    pTopGrp->color( FL_LIGHT2 );
+    pTopGrp->color( fl_lighter( FL_LIGHT2 ) );
+    
+    ////////// Container Group
     Flx_Group &grp = createContainerGroup( pTopGrp->x() + _xspacing,
                               pTopGrp->y() + _yspacing,
                               pTopGrp->w() - 2*_xspacing,
-                              90 /*120*/ );
-    Flx_Group &grp2 = createCalculationGroup( grp.x(), grp.y() + grp.h() + _yspacing,
-                              grp.w(), 120 );
+                              90 + 2*_yspacing /*120*/ );
     
-    createVertragGroup( grp2.x(), grp2.y() + grp2.h() + _yspacing,
-                              grp2.w(), 120 /*90*/ );
+    /////////  Calculation Group
+    Flx_Group &grp2 = createCalculationGroup( grp.x() + 450, //grp.w() + _xspacing, 
+                                              grp.y() + _yspacing,
+                                              600, //pTopGrp->w() - grp.w() - 3*_xspacing,
+                                              //530, //grp.w(), 
+                                              90 );
+//    Flx_Group &grp2 = createCalculationGroup( grp.x(), grp.y() + grp.h() + _yspacing,
+//                                              530, //grp.w(), 
+//                                              90 );
+    
+    grp.add( grp2 );
+    
+    ////////// Vertrag Group
+    createVertragGroup( grp.x(), 
+                        grp.y() + grp.h() + _yspacing,
+                        grp.w(), 
+                        100 /*90*/ );
         
     pTopGrp->end();
     return *pTopGrp;
 }
+
+//Flx_Group &MainWindow::createContainerGroup( int x, int y, int w, int h ) {
+//    Flx_Group *p = new Flx_Group( x, y, w, h, "Container" );
+//    p->box( FL_BORDER_BOX );
+//    p->color( FL_LIGHT2 );
+//    p->labeltype( FL_EMBOSSED_LABEL );
+//    p->labelfont( 2 );
+//    p->align( Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE ) );
+//    
+//    ////////// Einzelpreis
+//    int X = x + 110;
+//    int Y = y + 2*_yspacing;
+//    _pEinzelpreis = (Flx_FloatInput*)createInput( X, Y, 60, INPUT_FLOAT, "Einzelpreis: " );
+//    
+//    ////////// Miete pro Tag
+//    X = _pEinzelpreis->x() + _pEinzelpreis->w() + 150;
+//    _pMieteContTag = (Flx_FloatInput*)createInput( X, Y, 60, INPUT_FLOAT, "Miete/Cont/Tag: " );
+//    
+//    ///////// Laufzeit
+//    X = _pMieteContTag->x() + _pMieteContTag->w() + 150;
+//    _pLaufzeit = (Flx_IntInput*)createInput( X, Y, 30, INPUT_INT, "Laufzeit (Jahre): " );
+//    
+//    ///////// Rückkaufswert
+//    X = _pLaufzeit->x() + _pLaufzeit->w()  + 110;
+//    _pRueckkauf = (Flx_FloatInput*)createInput( X, Y, 60, INPUT_FLOAT, "Rückkauf: " );
+//
+//    p->end();
+//
+//    return *p;
+//}
 
 Flx_Group &MainWindow::createContainerGroup( int x, int y, int w, int h ) {
     Flx_Group *p = new Flx_Group( x, y, w, h, "Container" );
@@ -127,9 +179,9 @@ Flx_Group &MainWindow::createContainerGroup( int x, int y, int w, int h ) {
     p->labelfont( 2 );
     p->align( Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE ) );
     
-    ////////// Spalte 1: Einzelpreis, Miete
+    ////////// 1. Spalte: Einzelpreis, Miete
     int X = x + 110;
-    int Y = y + 2*_yspacing;
+    int Y = y + 3*_yspacing;
     _pEinzelpreis = (Flx_FloatInput*)createInput( X, Y, 
                                                   60, INPUT_FLOAT, "Einzelpreis: " );
     
@@ -159,18 +211,29 @@ Flx_Group &MainWindow::createCalculationGroup( int x, int y, int w, int h ) {
     pGrp->labelfont( 2 );
     pGrp->align( Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE ) );
     pGrp->box( FL_BORDER_BOX );
-    pGrp->color( FL_LIGHT2 );
+    pGrp->color( fl_lighter( FL_LIGHT2 ) );
     
-    /////////// Zeile 1: AfA und persönl. Steuersatz
-    _pAfa = (Flx_FloatInput*)createInput( x + 110, y + 2*_yspacing, 50, 
-                                          INPUT_FLOAT, "AfA (%): " );
-    _pSteuersatz = (Flx_FloatInput*)createInput( _pAfa->x() + _pAfa->w() + 170,
-                                                 _pAfa->y(), 50, 
+    /////////// Zeile 1: AfA,  persönl. Steuersatz, Berechnen-Button
+     _pAfaChoice = new Flx_Choice( x + 110, y + 2*_yspacing, 60, 25, "AfA (%): " );
+     _pAfaChoice->color( FL_WHITE );
+     _pAfaChoice->add( "10.0" );
+     _pAfaChoice->add( "12.5" );
+//    _pAfa = (Flx_FloatInput*)createInput( x + 110, y + 2*_yspacing, 50, 
+//                                          INPUT_FLOAT, "AfA (%): " );
+    
+    _pSteuersatz = (Flx_FloatInput*)createInput( _pAfaChoice->x() + _pAfaChoice->w() + 170,
+                                                 _pAfaChoice->y(), 50, 
                                                 INPUT_FLOAT, "Steuersatz (%): " );
     
+    _pBtnRendite = new Flx_Button( _pSteuersatz->x() + _pSteuersatz->w() + _xspacing, 
+                                   _pSteuersatz->y(),
+                                   125, _inputHeight, 
+                                   "Rendite berechnen" );
+    _pBtnRendite->signalSelected.connect<MainWindow, &MainWindow::onBtnRenditePushed>( this );
+    
     /////////// Zeile 2: Rendite mit AfA/Steuer, Rendite ohne AfA/Steuer
-    _pRenditeMit = (Flx_Output*)createInput( _pAfa->x(), 
-                                             _pAfa->y() + _pAfa->h() + _yspacing, 
+    _pRenditeMit = (Flx_Output*)createInput( _pAfaChoice->x(), 
+                                             _pAfaChoice->y() + _pAfaChoice->h() + _yspacing, 
                                              50, OUTPUT, 
                                              "Rendite(%): " );
     Flx_Box *pBoxMit = new Flx_Box( _pRenditeMit->x() + _pRenditeMit->w() + 5,
@@ -185,10 +248,10 @@ Flx_Group &MainWindow::createCalculationGroup( int x, int y, int w, int h ) {
     pBoxOhne->color( pGrp->color() );  
     
     /////////// Zeile 3: Button "Rendite berechnen"
-    _pBtnRendite = new Flx_Button( _pAfa->x(), 
-                                _pRenditeMit->y() + _pRenditeMit->h() + _yspacing,
-                                270, _inputHeight, "Rendite berechnen" );
-    _pBtnRendite->signalSelected.connect<MainWindow, &MainWindow::onBtnRenditePushed>( this );
+//    _pBtnRendite = new Flx_Button( _pAfa->x(), 
+//                                _pRenditeMit->y() + _pRenditeMit->h() + _yspacing,
+//                                270, _inputHeight, "Rendite berechnen" );
+//    _pBtnRendite->signalSelected.connect<MainWindow, &MainWindow::onBtnRenditePushed>( this );
    
     pGrp->end();
       
@@ -204,7 +267,7 @@ Flx_Group &MainWindow::createVertragGroup( int x, int y, int w, int h ) {
     pGrp->color( FL_LIGHT2 );
     
     /////////// Zeile 1: Angebot, Vertragsnummer, Kunde
-    _pAngebot = (Flx_Input*)createInput( x + 110, y + 2*_yspacing, 80, 
+    _pAngebot = (Flx_Input*)createInput( x + 110, y + 3*_yspacing, 80, 
                                           INPUT_ALPHA, "Angebot: " );
     
     _pVertrag = (Flx_Input*)createInput( _pAngebot->x() + _pAngebot->w() + 160,
@@ -232,11 +295,11 @@ Flx_Group &MainWindow::createVertragGroup( int x, int y, int w, int h ) {
                                             INPUT_INT, "Anzahl: " );
     
     /////////// Zeile 3: Button "Containervertrag speichern"
-    _pBtnSave = new Flx_Button( _pMietbeginn->x(),
-                                _pMietbeginn->y() + _pMietbeginn->h() + _yspacing,
-                                270, _inputHeight, "Containervertrag speichern" );
-    _pBtnSave->signalSelected.connect<MainWindow, &MainWindow::onBtnSavePushed>( this );
-    _pBtnSave->deactivate();
+//    _pBtnSave = new Flx_Button( _pMietbeginn->x(),
+//                                _pMietbeginn->y() + _pMietbeginn->h() + _yspacing,
+//                                270, _inputHeight, "Containervertrag speichern" );
+//    _pBtnSave->signalSelected.connect<MainWindow, &MainWindow::onBtnSavePushed>( this );
+//    _pBtnSave->deactivate();
 
     pGrp->end();
     return *pGrp;
@@ -281,7 +344,7 @@ Fl_Widget *MainWindow::createInput( int x, int y, int w, int kindInput, const ch
  flx::Flx_Group &MainWindow::createAlleVertraegeGroup( int x, int y, int w, int h ) {
     Flx_Group *pGrp  = new Flx_Group( x, y, w, h, "Vertragsbestand" );
     pGrp->box(FL_BORDER_BOX);
-    pGrp->color(FL_LIGHT2);
+    pGrp->color( fl_lighter( FL_LIGHT2 ) );
     pGrp->labeltype( FL_EMBOSSED_LABEL );
     pGrp->labelfont( 2 );
     pGrp->align( Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE ) );
@@ -297,10 +360,9 @@ Fl_Widget *MainWindow::createInput( int x, int y, int w, int kindInput, const ch
     _pTable->labelcolor(FL_FOREGROUND_COLOR);
     _pTable->row_header( 0 );
     _pTable->align(Fl_Align(FL_ALIGN_TOP));
-    //_pTable->when(FL_WHEN_RELEASE);
     _pTable->setSelectionMode( FLX_SELECTION_SINGLEROW );
     _pTable->setSortable( true );
-    
+    _pTable->signalSelected.connect<MainWindow, &MainWindow::onVertraegeTableSelectionChanged>( this );
     pGrp->end();
     
     return *pGrp;
@@ -309,31 +371,35 @@ Fl_Widget *MainWindow::createInput( int x, int y, int w, int kindInput, const ch
 flx::Flx_Group &MainWindow::createDepotGroup( int x, int y, int w, int h ) {
     Flx_Group *pGrp  = new Flx_Group( x, y, w, h, "Depot" );
     pGrp->box(FL_BORDER_BOX);
-    pGrp->color(FL_LIGHT2);
+    pGrp->color( fl_lighter( FL_LIGHT2 ) );
     pGrp->labeltype( FL_EMBOSSED_LABEL );
     pGrp->labelfont( 2 );
     pGrp->align( Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE ) );
     
     _pAnzahlAktiveVertraege = new Flx_Output( x + 175, 
                                       y + 2*_yspacing, 
-                                      25, 25, "Aktive Verträge im Depot" );
+                                      25, 25, "Aktive Verträge: " );
     _pAnzahlAktiveVertraege->value( "0" );
     
-    _pDepotZeitwert = new Flx_Output( _pAnzahlAktiveVertraege->x(), 
+    _pSummeInvest = new Flx_Output( _pAnzahlAktiveVertraege->x(), 
                                       _pAnzahlAktiveVertraege->y() + _pAnzahlAktiveVertraege->h() + _yspacing, 
-                                      55, 25, "Zeitwert des Depots" );
+                                      55, 25, "Summe Investitionen: "  );
+    
+    _pDepotZeitwert = new Flx_Output( _pAnzahlAktiveVertraege->x(), 
+                                      _pSummeInvest->y() + _pSummeInvest->h() + _yspacing, 
+                                      55, 25, "Zeitwert: " );
     _pDepotZeitwert->textfont( FL_HELVETICA_BOLD );
     
     
     _pDepotSummeRueckkauf = new Flx_Output( _pDepotZeitwert->x(),
                                             _pDepotZeitwert->y() + _pDepotZeitwert->h() + _yspacing, 
-                                            55, 25, "Summe d. Rückkaufswerte" );
+                                            55, 25, "Summe Rückkaufswerte: " );
    _pDepotSummeRueckkauf->textfont( FL_HELVETICA_BOLD );
 
     
     _pSumVeraeussGewinne = new Flx_Output( _pDepotSummeRueckkauf->x(),
                                            _pDepotSummeRueckkauf->y() + _pDepotSummeRueckkauf->h() + _yspacing, 
-                                           55, 25, "Summe d. Veräuß.gewinne" );
+                                           55, 25, "Summe Veräuß.gewinne: " );
     _pSumVeraeussGewinne->textfont( FL_HELVETICA_BOLD );
     
     pGrp->end();
@@ -344,7 +410,7 @@ flx::Flx_Group &MainWindow::createDepotGroup( int x, int y, int w, int h ) {
 flx::Flx_Group &MainWindow::createSteuerGroup( int x, int y, int w, int h ) {
     Flx_Group *pGrp  = new Flx_Group( x, y, w, h, "Steuerliche Auswirkungen" );
     pGrp->box(FL_BORDER_BOX);
-    pGrp->color(FL_LIGHT2);
+    pGrp->color( fl_lighter( FL_LIGHT2 ) );
     pGrp->labeltype( FL_EMBOSSED_LABEL );
     pGrp->labelfont( 2 );
     pGrp->align( Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE ) );
@@ -399,7 +465,8 @@ void MainWindow::onBtnRenditePushed( flx::Flx_Button &, flx::ActionParm & ) {
     calcData.JahreLaufzeit = _pLaufzeit->intValue();
     calcData.MieteProTag = _pMieteContTag->floatValue();
     calcData.Rueckkaufpreis = _pRueckkauf->floatValue();
-    calcData.AfA = _pAfa->floatValue();
+    calcData.AfA = Convert::toFloat( _pAfaChoice->text() );
+    //calcData.AfA = _pAfa->floatValue();
     calcData.Steuersatz = _pSteuersatz->floatValue();
     signalCalculateRendite.send( this, &calcData );
 }
@@ -410,7 +477,8 @@ void MainWindow::onBtnSavePushed( flx::Flx_Button &, flx::ActionParm & ) {
     vertrag.Tagesmiete = _pMieteContTag->floatValue();
     vertrag.JahreMietdauer = _pLaufzeit->intValue();
     vertrag.Rueckkaufswert = _pRueckkauf->floatValue();
-    vertrag.AfA = _pAfa->floatValue();
+    vertrag.AfA = Convert::toFloat( _pAfaChoice->text() );
+    //vertrag.AfA = _pAfa->floatValue();
     vertrag.Angebot.add( _pAngebot->value() );
     vertrag.Vertrag.add( _pVertrag->value() );
     vertrag.LfdNr = _pLfdNr->intValue();
@@ -420,6 +488,10 @@ void MainWindow::onBtnSavePushed( flx::Flx_Button &, flx::ActionParm & ) {
     vertrag.Mietende.FromEurString( _pMietende->value() );
     signalSaveVertrag.send( *this, vertrag );
     _pBtnSave->deactivate();
+}
+
+void MainWindow::onVertraegeTableSelectionChanged( Flx_Table &, SelectionEvent &evt ) {
+    _pBtnDelete->activate();
 }
 
 void MainWindow::onNumericInputChanged( flx::Flx_NumericInput &inp, flx::ActionParm & ) {
@@ -458,7 +530,7 @@ bool MainWindow::canSave() const {
         strlen( _pAngebot->value() ) > 0 &&
         strlen( _pKunde->value() ) > 0 &&
         _pAnzahl->intValue() > 0 &&
-        _pAfa->floatValue() > 0 &&        
+        //_pAfa->floatValue() > 0 &&        
         _pEinzelpreis->floatValue() > 0 &&
         _pMieteContTag->floatValue() > 0 &&
         _pLaufzeit->intValue() > 0 &&
@@ -473,6 +545,7 @@ bool MainWindow::canSave() const {
 void MainWindow::checkSaveButton() {
     if( canSave() ) {
         _pBtnSave->activate();
+        
     } else {
         _pBtnSave->deactivate();
     }
@@ -504,7 +577,9 @@ VertraegeTableData &MainWindow::getVertraege() const {
 
 void MainWindow::setDepotData( DepotData depotData ) {
     _pAnzahlAktiveVertraege->
-        value( std::to_string( depotData.AnzahlAktiveVertraege ).c_str() );
+        value( to_string( depotData.AnzahlAktiveVertraege ).c_str() );
+    
+    _pSummeInvest->value( to_string( depotData.SummeInvest ).c_str() );
     
     _pDepotZeitwert->
         value( to_string( depotData.DepotwertHeute ).c_str() );
