@@ -11,6 +11,7 @@
 #include "Calculator.h"
 #include "Vertraege.h"
 #include "SaveHandler.h"
+#include "VeranlagungCalculator.h"
 
 class MainWindow;
 
@@ -25,6 +26,7 @@ private:
     Calculator _calc;
     VertraegeTableData _vertraegeTableData;
     SaveHandler _saveHandler;
+    VeranlagungCalculator _veranlCalc;
 };
 
 #endif	/* APPLICATION_H */

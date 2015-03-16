@@ -15,6 +15,8 @@
 #include "CalculationData.h"
 #include "Vertrag.h"
 #include "DepotDataCalculator.h"
+#include "VeranlagungParm.h"
+#include "VeranlagungTableData.h"
 
 namespace flx {
     class Flx_Group;
@@ -42,6 +44,7 @@ class Fl_Pixmap;
 
 class VertraegeTableData;
 
+
 class IRendite {
 public:
     virtual void setRenditeOhneAfA( float rendite ) = 0;
@@ -52,6 +55,7 @@ class MainWindow : public flx::Flx_Window, public IRendite {
 public:
     my::Signal<IRendite, CalculationData> signalCalculateRendite;
     my::Signal<MainWindow, Vertrag> signalSaveVertrag;
+    my::Signal<MainWindow, VeranlagungParm> signalRefreshVeranlagung;
 public:
     MainWindow( int x, int y );
     virtual ~MainWindow();
@@ -61,6 +65,12 @@ public:
     VertraegeTableData &getVertraege() const;
     void setDepotData( DepotData depotData );
     void setVeranlagungsjahre( std::vector<int> &jahre );
+    /**
+     * übergibt ein TableData-Model für die Veranlagungsdaten-
+     * tabelle.
+     * @param  veranlDaten: die Veranlagungsdaten
+     */
+    void setVeranlagungsdaten( VeranlagungTableDataPtr pVeranlDaten );
 //    void clear();
 private:
     void onToolButtonSelected( flx::Flx_ToolBar &, flx::ToolAction & );
@@ -70,6 +80,7 @@ private:
     void onNumericInputChanged( flx::Flx_NumericInput &, flx::ActionParm & );
     void onAlphaInputChanged( flx::Flx_Input &, flx::ActionParm & );
     void onMietbeginnChanged( flx::Flx_DateChooser &, my::MyDate & );
+    void onRefreshVeranlagungsdaten( flx::Flx_Button &, flx::ActionParm & );
     flx::Flx_Group &createTopGroup();
     flx::Flx_Group & createContainerGroup( int x, int y, int w, int h );
     flx::Flx_Group &createCalculationGroup( int x, int y, int w, int h );
@@ -136,6 +147,8 @@ private:
     flx::Flx_Choice *_pJahrAuswahl;
     flx::Flx_IntInput *_pSteuersatz2;
     flx::Flx_Table *_pSteuerTable;
+    flx::Flx_Button *_pBtnRefreshTable;
+    VeranlagungTableDataPtr _pVeranlagungsdaten;
 };
 
 #endif	/* MAINWINDOW_H */

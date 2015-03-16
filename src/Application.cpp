@@ -23,6 +23,12 @@ Application::Application( ) {
     
     _pWin->signalSaveVertrag.
         connect< SaveHandler, &SaveHandler::saveVertrag >( &_saveHandler );
+    
+    _veranlCalc.setVertraege( _vertraegeTableData );
+    
+    _pWin->signalRefreshVeranlagung
+            .connect< VeranlagungCalculator, 
+                     &VeranlagungCalculator::onRefreshVeranlagung >( &_veranlCalc );
 }
 
 void Application::init() {

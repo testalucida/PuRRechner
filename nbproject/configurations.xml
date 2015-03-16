@@ -31,6 +31,11 @@
         <itemPath>/home/max/cpp/fltk/PuRRechner/src/Readme.txt</itemPath>
         <itemPath>/home/max/cpp/fltk/PuRRechner/src/SaveHandler.cpp</itemPath>
         <itemPath>/home/max/cpp/fltk/PuRRechner/src/SaveHandler.h</itemPath>
+        <itemPath>/home/max/cpp/fltk/PuRRechner/src/VeranlagungCalculator.cpp</itemPath>
+        <itemPath>/home/max/cpp/fltk/PuRRechner/src/VeranlagungCalculator.h</itemPath>
+        <itemPath>/home/max/cpp/fltk/PuRRechner/src/VeranlagungParm.h</itemPath>
+        <itemPath>/home/max/cpp/fltk/PuRRechner/src/VeranlagungTableData.cpp</itemPath>
+        <itemPath>/home/max/cpp/fltk/PuRRechner/src/VeranlagungTableData.h</itemPath>
         <itemPath>/home/max/cpp/fltk/PuRRechner/src/Vertraege.cpp</itemPath>
         <itemPath>/home/max/cpp/fltk/PuRRechner/src/Vertraege.h</itemPath>
         <itemPath>/home/max/cpp/fltk/PuRRechner/src/Vertrag.h</itemPath>
@@ -179,6 +184,31 @@
             flavor2="0">
       </item>
       <item path="/home/max/cpp/fltk/PuRRechner/src/SaveHandler.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VeranlagungCalculator.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VeranlagungCalculator.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VeranlagungParm.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VeranlagungTableData.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VeranlagungTableData.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -337,6 +367,31 @@
             flavor2="0">
       </item>
       <item path="/home/max/cpp/fltk/PuRRechner/src/SaveHandler.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VeranlagungCalculator.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VeranlagungCalculator.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VeranlagungParm.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VeranlagungTableData.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VeranlagungTableData.h"
             ex="false"
             tool="3"
             flavor2="0">

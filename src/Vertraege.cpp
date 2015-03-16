@@ -7,10 +7,7 @@
 
 #include "Vertraege.h"
 
-
-
 using namespace my;
-
 
 VertraegeTableData::VertraegeTableData( ) : TableData() {
     

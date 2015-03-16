@@ -26,6 +26,8 @@ void SaveHandler::saveVertrag( MainWindow &w, Vertrag &v ) {
     
     if( pVertrag->isEmpty() ) {
         io.insertVertrag( v );
+        //TODO: muss der neue Vertrag in _pVertraege aufgenommen werden?
+        //Wenn nicht hier, wer macht das dann wo?
     } else {
         io.updateVertrag( v );
     }

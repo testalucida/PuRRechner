@@ -7,6 +7,7 @@
 
 #include "MainWindow.h"
 #include "Vertraege.h"
+#include "VeranlagungTableData.h"
 //#include "../images/new3.xpm"
 //#include "../images/new3_deact.xpm"
 #include "../images/new4.xpm"
@@ -16,6 +17,8 @@
 #include "../images/save_deact.xpm"
 #include "../images/rubbish.xpm"  
 #include "../images/rubbish_deact.xpm"  
+#include "../images/play.xpm"
+#include "VeranlagungParm.h"
 
 #include <flx/Flx_Group.h>
 #include <flx/Flx_Choice.h>
@@ -405,11 +408,23 @@ flx::Flx_Group &MainWindow::createSteuerGroup( int x, int y, int w, int h ) {
     _pSteuersatz2 = new Flx_IntInput( _pJahrAuswahl->x() + _pJahrAuswahl->w() + 100,
                                   _pJahrAuswahl->y(), 30, 25, "Steuersatz (%)" );
     _pSteuersatz2->value( "30" );
+    
+    ////////// Refresh-Button
+    _pBtnRefreshTable = new Flx_Button( _pSteuersatz2->x() + _pSteuersatz2->w() + _xspacing,
+                                        _pSteuersatz2->y(),
+                                        50, 25 );
+    Fl_Pixmap *pImage = new Fl_Pixmap( play_xpm );
+    _pBtnRefreshTable->image( pImage );
+    _pBtnRefreshTable->tooltip( "Tabelle aktualisieren" );
+    _pBtnRefreshTable->signalSelected
+            .connect<MainWindow, &MainWindow::onRefreshVeranlagungsdaten>( this );
+    //////////////////////////
 
     int Y = _pJahrAuswahl->y() + _pJahrAuswahl->h() + _yspacing;
     _pSteuerTable = new Flx_Table( x + _xspacing, Y,
                                    w - 2*_xspacing, 
                                    y + h - Y - _yspacing );
+    _pSteuerTable->setSelectionMode( FLX_SELECTION_SINGLEROW );
     
     return *pGrp;
 }
@@ -622,6 +637,13 @@ void MainWindow::onMietbeginnChanged( Flx_DateChooser &, my::MyDate &date ) {
     _isDirty = true;
 }
 
+void MainWindow::onRefreshVeranlagungsdaten( Flx_Button &, ActionParm & ) {
+    VeranlagungParm parm;
+    parm.jahr = Convert::ToInt( _pJahrAuswahl->text() );
+    parm.steuersatz = _pSteuersatz2->intValue();
+    signalRefreshVeranlagung.send( *this, parm );
+}
+
 void MainWindow::onAlphaInputChanged( flx::Flx_Input &inp, flx::ActionParm & ) {
     _isDirty = true;
     checkSaveButton();
@@ -694,6 +716,11 @@ void MainWindow::setVeranlagungsjahre( std::vector<int> &jahre ) {
         _pJahrAuswahl->add( to_string( j ).c_str() );
     }
     _pJahrAuswahl->value( 0 );
+}
+
+void MainWindow::setVeranlagungsdaten( VeranlagungTableDataPtr pVeranlagungsdaten ) {
+    _pVeranlagungsdaten = pVeranlagungsdaten;
+    _pSteuerTable->setTableData( *pVeranlagungsdaten );
 }
 
 //void MainWindow::clear() {

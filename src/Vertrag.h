@@ -27,7 +27,7 @@ struct Vertrag {
     float Tagesmiete;
     int JahreMietdauer;
     float Rueckkaufswert;
-    float AfA;
+    float AfA; //in Prozent
     float Veraeusserungsgewinn;
     MyDate Mietbeginn;
     MyDate Mietende;

@@ -43,6 +43,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/_ext/2110116603/MainWindow.o \
 	${OBJECTDIR}/_ext/2110116603/MySql.o \
 	${OBJECTDIR}/_ext/2110116603/SaveHandler.o \
+	${OBJECTDIR}/_ext/2110116603/VeranlagungCalculator.o \
+	${OBJECTDIR}/_ext/2110116603/VeranlagungTableData.o \
 	${OBJECTDIR}/_ext/2110116603/Vertraege.o \
 	${OBJECTDIR}/_ext/2110116603/main.o
 
@@ -110,6 +112,16 @@ ${OBJECTDIR}/_ext/2110116603/SaveHandler.o: /home/max/cpp/fltk/PuRRechner/src/Sa
 	${MKDIR} -p ${OBJECTDIR}/_ext/2110116603
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/home/max/cpp/fltk/PuRRechner/src -I/home/max/cpp/My_1_5 -I/home/max/cpp/fltk/Flx_1 -I/home/max/cpp/fltk-1.3.2 -I/usr/include/mysql -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/2110116603/SaveHandler.o /home/max/cpp/fltk/PuRRechner/src/SaveHandler.cpp
+
+${OBJECTDIR}/_ext/2110116603/VeranlagungCalculator.o: /home/max/cpp/fltk/PuRRechner/src/VeranlagungCalculator.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/2110116603
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/home/max/cpp/fltk/PuRRechner/src -I/home/max/cpp/My_1_5 -I/home/max/cpp/fltk/Flx_1 -I/home/max/cpp/fltk-1.3.2 -I/usr/include/mysql -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/2110116603/VeranlagungCalculator.o /home/max/cpp/fltk/PuRRechner/src/VeranlagungCalculator.cpp
+
+${OBJECTDIR}/_ext/2110116603/VeranlagungTableData.o: /home/max/cpp/fltk/PuRRechner/src/VeranlagungTableData.cpp 
+	${MKDIR} -p ${OBJECTDIR}/_ext/2110116603
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/home/max/cpp/fltk/PuRRechner/src -I/home/max/cpp/My_1_5 -I/home/max/cpp/fltk/Flx_1 -I/home/max/cpp/fltk-1.3.2 -I/usr/include/mysql -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/2110116603/VeranlagungTableData.o /home/max/cpp/fltk/PuRRechner/src/VeranlagungTableData.cpp
 
 ${OBJECTDIR}/_ext/2110116603/Vertraege.o: /home/max/cpp/fltk/PuRRechner/src/Vertraege.cpp 
 	${MKDIR} -p ${OBJECTDIR}/_ext/2110116603
