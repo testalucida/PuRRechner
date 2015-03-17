@@ -27,6 +27,11 @@ void VeranlagungCalculator::
     
     VertragPtrVectorPtr pVertraege = _pVertraegeTableData->getVertraege();
     const char **ppColNames = VeranlagungsdatenHeaderNames;
+    int jahresmietSumme = 0;
+    int afaSumme = 0;
+    int steuerlErgebSumme = 0;
+    int steuerSumme = 0;
+    int veraeussGewinnSumme = 0;
     for( auto v : *pVertraege ) {
         if( parm.jahr <= v->Mietende.GetYear() ) {
             int days = getAnzahlMiettage( v->Mietbeginn, 
@@ -41,6 +46,7 @@ void VeranlagungCalculator::
             p->setValue( v->Vertrag.get(), row, ppColNames[VERANLAGG_VERTRAG] );
             //Jahresmieteinnahme:
             int jahresmiete = days * v->Tagesmiete * v->Menge;
+            jahresmietSumme += jahresmiete;
             p->setValue( to_string( jahresmiete).c_str(), row, ppColNames[VERANLAGG_MIETE] );
             //AfA in Prozent:
             StringPtr pAfa = Convert::toString( v->AfA, "%.1f" );
@@ -48,6 +54,7 @@ void VeranlagungCalculator::
             //AfA in Euro:
             float afa = (v->AfA * v->Gesamtpreis / 100);
             afa *= ((float)days/(float)365); //AfA nur für die Tage, für die auch Mieteinnahmen erzielt wurden
+            afaSumme += afa;
             p->setValue( to_string( (int)afa ).c_str(), row, ppColNames[VERANLAGG_AFA_EURO] );
             //Jahr des Rückkaufs:
             p->setValue( to_string( v->Mietende.GetYear() ).c_str(), row, ppColNames[VERANLAGG_RUECKKAUF] );
@@ -55,22 +62,31 @@ void VeranlagungCalculator::
             int veraeussGewinn = 0;
             if( parm.jahr == v->Mietende.GetYear() ) {
                 veraeussGewinn = v->Veraeusserungsgewinn;
+                veraeussGewinnSumme += veraeussGewinn;
                 p->setValue( to_string( veraeussGewinn ).c_str(), row, 
                              ppColNames[VERANLAGG_VERAEUSSGEWINN] );
             } 
             //steuerliches Ergebnis:
             //setzt sich so zusammen: jahresmiete + Veräußerungsgewinn - AfA.
             int steuerlErgeb = jahresmiete + veraeussGewinn - afa;
+            steuerlErgebSumme += steuerlErgeb;
             p->setValue( to_string( steuerlErgeb ).c_str(), row, ppColNames[VERANLAGG_STEUERL_ERGEBNIS] );
             
             //Steuer in Euro:
             int steuer = (parm.steuersatz * steuerlErgeb)/100;
+            steuerSumme += steuer;
             p->setValue( to_string( steuer ).c_str(), row, ppColNames[VERANLAGG_STEUER] );
         }
     }
     
     //Summenzeile:
-    
+    int row = p->addRow();
+     p->setValue( "SUMMEN", row, ppColNames[VERANLAGG_VERTRAG] );
+     p->setValue( to_string( jahresmietSumme).c_str(), row, ppColNames[VERANLAGG_MIETE] );
+     p->setValue( to_string( afaSumme ).c_str(), row, ppColNames[VERANLAGG_AFA_EURO] );
+     p->setValue( to_string( steuerlErgebSumme ).c_str(), row, ppColNames[VERANLAGG_STEUERL_ERGEBNIS] );
+     p->setValue( to_string( steuerSumme ).c_str(), row, ppColNames[VERANLAGG_STEUER] );
+     p->setValue( to_string( veraeussGewinnSumme ).c_str(), row, ppColNames[VERANLAGG_VERAEUSSGEWINN] );
     
     p->sort( 4, SORTDIRECTION_ASC );
     win.setVeranlagungsdaten( p );
