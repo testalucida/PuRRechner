@@ -22,6 +22,8 @@ public:
     MainWindow &getWindow() const;
     virtual ~Application();
 private:
+    void onRefreshMietertrag( MainWindow &, float & );
+private:
     MainWindow *_pWin;
     Calculator _calc;
     VertraegeTableData _vertraegeTableData;

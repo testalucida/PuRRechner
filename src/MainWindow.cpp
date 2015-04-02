@@ -103,7 +103,7 @@ MainWindow::MainWindow( int x, int y )
     _pLaufzeit->value( "5" );
     //->value( 10.0 );
     _pAfaChoice->value( 0 );
-    _pSteuersatz->value( 30.0 );
+//    _pSteuersatz->value( 30.0 );
     _pLfdNr->value( "0" );
     _pKunde->value( "M" );
    
@@ -363,32 +363,46 @@ flx::Flx_Group &MainWindow::createDepotGroup( int x, int y, int w, int h ) {
     pGrp->labelfont( 2 );
     pGrp->align( Fl_Align(FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE ) );
     
+    const int dy = 7;
+    
     _pAnzahlAktiveVertraege = new Flx_Output( x + 175, 
-                                      y + 2*_yspacing, 
+                                      y + _yspacing, 
                                       25, 25, "Aktive Verträge: " );
     _pAnzahlAktiveVertraege->value( "0" );
     
     _pSummeInvest = new Flx_Output( _pAnzahlAktiveVertraege->x(), 
-                                      _pAnzahlAktiveVertraege->y() + _pAnzahlAktiveVertraege->h() + _yspacing, 
+                                      _pAnzahlAktiveVertraege->y() + _pAnzahlAktiveVertraege->h() + dy, 
                                       55, 25, "Summe Investitionen: "  );
     
     _pDepotZeitwert = new Flx_Output( _pAnzahlAktiveVertraege->x(), 
-                                      _pSummeInvest->y() + _pSummeInvest->h() + _yspacing, 
+                                      _pSummeInvest->y() + _pSummeInvest->h() + dy, 
                                       55, 25, "Zeitwert: " );
     _pDepotZeitwert->textfont( FL_HELVETICA_BOLD );
     
     
     _pDepotSummeRueckkauf = new Flx_Output( _pDepotZeitwert->x(),
-                                            _pDepotZeitwert->y() + _pDepotZeitwert->h() + _yspacing, 
+                                            _pDepotZeitwert->y() + _pDepotZeitwert->h() + dy, 
                                             55, 25, "Summe Rückkaufswerte: " );
    _pDepotSummeRueckkauf->textfont( FL_HELVETICA_BOLD );
 
     
     _pSumVeraeussGewinne = new Flx_Output( _pDepotSummeRueckkauf->x(),
-                                           _pDepotSummeRueckkauf->y() + _pDepotSummeRueckkauf->h() + _yspacing, 
+                                           _pDepotSummeRueckkauf->y() + _pDepotSummeRueckkauf->h() + dy, 
                                            55, 25, "Summe Veräuß.gewinne: " );
     _pSumVeraeussGewinne->textfont( FL_HELVETICA_BOLD );
     
+    _pMietertragNachSteuer = new Flx_Output( _pSumVeraeussGewinne->x(),
+                                             _pSumVeraeussGewinne->y() + _pSumVeraeussGewinne->h() + dy, 
+                                             55, 25, "Jhrl. Ertrag nach Steuern: " );
+    _pSteuersatz3 = new Flx_FloatInput( _pMietertragNachSteuer->x() + _pMietertragNachSteuer->w() + 10,
+                                   _pMietertragNachSteuer->y(),
+                                   35, 25, " %Steuer" );
+    _pSteuersatz3->align( FL_ALIGN_RIGHT );
+    
+    _pBtnRefreshErtrag = new Flx_Button( _pSteuersatz3->x() + _pSteuersatz3->w() + 70,
+                                         _pSteuersatz3->y(),
+                                         25, 25, "@>" );
+    _pBtnRefreshErtrag->signalSelected.connect<MainWindow, &MainWindow::onRefreshErtrag>( this );
     pGrp->end();
     
     return *pGrp;
@@ -405,16 +419,15 @@ flx::Flx_Group &MainWindow::createSteuerGroup( int x, int y, int w, int h ) {
     _pJahrAuswahl = new Flx_Choice( x + 125, y + 2*_yspacing, 75, 25, "Veranlagungsjahr" );
     _pJahrAuswahl->color( FL_WHITE );
     
-    _pSteuersatz2 = new Flx_IntInput( _pJahrAuswahl->x() + _pJahrAuswahl->w() + 100,
+    _pSteuersatz2 = new Flx_FloatInput( _pJahrAuswahl->x() + _pJahrAuswahl->w() + 100,
                                   _pJahrAuswahl->y(), 30, 25, "Steuersatz (%)" );
-    _pSteuersatz2->value( "30" );
     
     ////////// Refresh-Button
     _pBtnRefreshTable = new Flx_Button( _pSteuersatz2->x() + _pSteuersatz2->w() + _xspacing,
                                         _pSteuersatz2->y(),
-                                        50, 25 );
-    Fl_Pixmap *pImage = new Fl_Pixmap( play_xpm );
-    _pBtnRefreshTable->image( pImage );
+                                        25, 25, "@>" );
+//    Fl_Pixmap *pImage = new Fl_Pixmap( play_xpm );
+//    _pBtnRefreshTable->image( pImage );
     _pBtnRefreshTable->tooltip( "Tabelle aktualisieren" );
     _pBtnRefreshTable->signalSelected
             .connect<MainWindow, &MainWindow::onRefreshVeranlagungsdaten>( this );
@@ -577,7 +590,8 @@ void MainWindow::setInputFieldsFromTableRow() {
     _pKunde->value( pV->Kunde.get() );
     _pMietbeginn->setDate( pV->Mietbeginn );
     _pMietende->value( pV->Mietende.ToEurString().c_str() );
-    
+    _pAfaChoice->value( pV->AfA < 12 ? 0 : 1 );   
+   
     _pEinzelpreis->take_focus();
 }
 
@@ -640,8 +654,13 @@ void MainWindow::onMietbeginnChanged( Flx_DateChooser &, my::MyDate &date ) {
 void MainWindow::onRefreshVeranlagungsdaten( Flx_Button &, ActionParm & ) {
     VeranlagungParm parm;
     parm.jahr = Convert::ToInt( _pJahrAuswahl->text() );
-    parm.steuersatz = _pSteuersatz2->intValue();
+    parm.steuersatz = _pSteuersatz2->floatValue();
     signalRefreshVeranlagung.send( *this, parm );
+}
+
+void MainWindow::onRefreshErtrag( flx::Flx_Button &, flx::ActionParm & ) {
+    float steuersatz = _pSteuersatz3->floatValue();
+    signalRefreshMietertrag.send( this, &steuersatz );
 }
 
 void MainWindow::onAlphaInputChanged( flx::Flx_Input &inp, flx::ActionParm & ) {
@@ -708,6 +727,11 @@ void MainWindow::setDepotData( DepotData depotData ) {
     
     _pSumVeraeussGewinne->
         value( to_string( depotData.SummeVeraeussGewinne ).c_str() );
+    
+    if( _pSteuersatz3->floatValue() > 0 ) {
+        int e =  (int)((float)depotData.JhrlEtragNachSteuern * _pSteuersatz3->floatValue() );
+        _pMietertragNachSteuer->value( to_string( e ).c_str() );
+    }
    
 }
 
@@ -721,6 +745,16 @@ void MainWindow::setVeranlagungsjahre( std::vector<int> &jahre ) {
 void MainWindow::setVeranlagungsdaten( VeranlagungTableDataPtr pVeranlagungsdaten ) {
     _pVeranlagungsdaten = pVeranlagungsdaten;
     _pSteuerTable->setTableData( *pVeranlagungsdaten );
+}
+
+void MainWindow::setSteuersatz( float prozent ) {
+    _pSteuersatz->value( prozent, "%.0f" );
+    _pSteuersatz2->value( prozent, "%.0f" );
+    _pSteuersatz3->value( prozent, "%.0f" );
+}
+
+void MainWindow::setJahresMietertrag( int euro ) {
+    _pMietertragNachSteuer->value( to_string( euro ).c_str() );
 }
 
 //void MainWindow::clear() {

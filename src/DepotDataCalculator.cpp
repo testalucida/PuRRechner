@@ -36,12 +36,19 @@ DepotData DepotDataCalculator::getDepotData() const {
             depotData.AnzahlAktiveVertraege++;
             
             //Veräußerungsgewinne aufsummieren.
-            depotData.SummeVeraeussGewinne += pV->Veraeusserungsgewinn;;
+            depotData.SummeVeraeussGewinne += pV->Veraeusserungsgewinn;
+            
+            //Mietertrag über alle Verträge/Container aufsummieren.
+            depotData.JhrlEtragNachSteuern += getJahresmiete( pV );
         }
         
     } );
     
     return depotData;
+}
+
+int DepotDataCalculator::getJahresErtragNachSteuern( float steuersatz ) const{
+    return 12345;
 }
 
 float DepotDataCalculator::getVertragsrestwert( VertragPtr pV ) const {
@@ -63,6 +70,22 @@ float DepotDataCalculator::getVertragsrestwert( VertragPtr pV ) const {
     float restwert = pV->Rueckkaufswert + wertverlust;
     
     return restwert * pV->Menge;
+}
+
+int DepotDataCalculator::getJahresmiete( VertragPtr pV ) const {
+    int miettage = getMiettage( pV->Mietbeginn, pV->Mietende );
+    return miettage * pV->Tagesmiete * pV->Menge;
+}
+
+int DepotDataCalculator::getMiettage( const my::MyDate &mietBeginn, 
+                                      const my::MyDate &mietEnde ) const 
+{
+    MyDate today( true );
+    MyDate first = mietBeginn < today ? mietBeginn : today;
+    MyDate last = mietEnde > today ? mietEnde : today;
+    
+    int miettage = DateTimeCalculator::GetDuration( first, last );
+    return miettage;
 }
 
 DepotDataCalculator::~DepotDataCalculator( ) {

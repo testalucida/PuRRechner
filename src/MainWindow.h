@@ -56,6 +56,7 @@ public:
     my::Signal<IRendite, CalculationData> signalCalculateRendite;
     my::Signal<MainWindow, Vertrag> signalSaveVertrag;
     my::Signal<MainWindow, VeranlagungParm> signalRefreshVeranlagung;
+    my::Signal<MainWindow, float> signalRefreshMietertrag;
 public:
     MainWindow( int x, int y );
     virtual ~MainWindow();
@@ -65,6 +66,8 @@ public:
     VertraegeTableData &getVertraege() const;
     void setDepotData( DepotData depotData );
     void setVeranlagungsjahre( std::vector<int> &jahre );
+    void setSteuersatz( float prozent );
+    void setJahresMietertrag( int euro );
     /**
      * übergibt ein TableData-Model für die Veranlagungsdaten-
      * tabelle.
@@ -81,6 +84,7 @@ private:
     void onAlphaInputChanged( flx::Flx_Input &, flx::ActionParm & );
     void onMietbeginnChanged( flx::Flx_DateChooser &, my::MyDate & );
     void onRefreshVeranlagungsdaten( flx::Flx_Button &, flx::ActionParm & );
+    void onRefreshErtrag( flx::Flx_Button &, flx::ActionParm & );
     flx::Flx_Group &createTopGroup();
     flx::Flx_Group & createContainerGroup( int x, int y, int w, int h );
     flx::Flx_Group &createCalculationGroup( int x, int y, int w, int h );
@@ -144,8 +148,11 @@ private:
     flx::Flx_Output *_pDepotZeitwert;
     flx::Flx_Output *_pDepotSummeRueckkauf;
     flx::Flx_Output *_pSumVeraeussGewinne;
+    flx::Flx_Output *_pMietertragNachSteuer;
+    flx::Flx_FloatInput *_pSteuersatz3;
+    flx::Flx_Button *_pBtnRefreshErtrag;
     flx::Flx_Choice *_pJahrAuswahl;
-    flx::Flx_IntInput *_pSteuersatz2;
+    flx::Flx_FloatInput *_pSteuersatz2;
     flx::Flx_Table *_pSteuerTable;
     flx::Flx_Button *_pBtnRefreshTable;
     VeranlagungTableDataPtr _pVeranlagungsdaten;

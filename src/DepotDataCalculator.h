@@ -16,21 +16,30 @@ struct DepotData {
                 , DepotwertHeute(0)
                 , SummeRueckkaufwerte(0)
                 , SummeVeraeussGewinne( 0 )
+                , JhrlEtragNachSteuern( 0 )
     {}
     int AnzahlAktiveVertraege;
     int SummeInvest;
     int DepotwertHeute;
     int SummeRueckkaufwerte;
     int SummeVeraeussGewinne;
+    int JhrlEtragNachSteuern;
 };
 
 class DepotDataCalculator {
 public:
     DepotDataCalculator( VertragPtrVectorPtr pVertraegeVector );
     DepotData getDepotData() const;
+    int getJahresErtragNachSteuern( float steuersatz ) const;
     virtual ~DepotDataCalculator();
 private:
     float getVertragsrestwert( VertragPtr pVertrag ) const;
+    int getJahresmiete( VertragPtr pV ) const;
+    /**
+     * errechnet die Anzahl der Miettage im aktuellen Jahr.
+     */
+    int getMiettage( const my::MyDate &mietBeginn, 
+                     const my::MyDate &mietEnde ) const;
 private:
     VertragPtrVectorPtr _pVertraegeVector;
 };

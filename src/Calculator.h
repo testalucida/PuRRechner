@@ -16,7 +16,6 @@ public:
     Calculator();
     void onCalculate( IRendite &rendite, CalculationData &data );
     virtual ~Calculator();
-private:
     float calculateOhneAfa( const CalculationData & ) const;
     float calculateMitAfa( const CalculationData & ) const;
     /**

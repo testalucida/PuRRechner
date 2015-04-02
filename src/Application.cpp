@@ -29,6 +29,9 @@ Application::Application( ) {
     _pWin->signalRefreshVeranlagung
             .connect< VeranlagungCalculator, 
                      &VeranlagungCalculator::onRefreshVeranlagung >( &_veranlCalc );
+    
+    _pWin->signalRefreshMietertrag
+            .connect< Application, &Application::onRefreshMietertrag >( this );
 }
 
 void Application::init() {
@@ -40,11 +43,17 @@ void Application::init() {
     _pWin->setDepotData( wert );
     std::vector<int> jahre( {2014, 2015, 2016, 2017, 2018});
     _pWin->setVeranlagungsjahre( jahre );
-    
+    _pWin->setSteuersatz( 30 );
 }
 
 MainWindow &Application::getWindow() const {
     return *_pWin;
+}
+
+void Application::onRefreshMietertrag( MainWindow &, float &steuersatz ) {
+    DepotDataCalculator wertCalc( _vertraegeTableData.getVertraege() );
+    int mietertrag = wertCalc.getJahresErtragNachSteuern( steuersatz );
+    _pWin->setJahresMietertrag( mietertrag );
 }
 
 Application::~Application( ) {
