@@ -378,31 +378,44 @@ flx::Flx_Group &MainWindow::createDepotGroup( int x, int y, int w, int h ) {
                                       _pSummeInvest->y() + _pSummeInvest->h() + dy, 
                                       55, 25, "Zeitwert: " );
     _pDepotZeitwert->textfont( FL_HELVETICA_BOLD );
-    
+    _tooltipZeitwert.add( "Restwert aller aktiven Verträge.\n")
+            .add( "Restwert = Rückkaufswert + noch kommende Wertverluste.\n" )
+            .add( "Wertverlust = (Kaufpreis - Rückkauf) / Jahre Mietdauer." );
+    _pDepotZeitwert->tooltip( _tooltipZeitwert.get() );
     
     _pDepotSummeRueckkauf = new Flx_Output( _pDepotZeitwert->x(),
                                             _pDepotZeitwert->y() + _pDepotZeitwert->h() + dy, 
                                             55, 25, "Summe Rückkaufswerte: " );
-   _pDepotSummeRueckkauf->textfont( FL_HELVETICA_BOLD );
+   //_pDepotSummeRueckkauf->textfont( FL_HELVETICA_BOLD );
 
     
     _pSumVeraeussGewinne = new Flx_Output( _pDepotSummeRueckkauf->x(),
                                            _pDepotSummeRueckkauf->y() + _pDepotSummeRueckkauf->h() + dy, 
                                            55, 25, "Summe Veräuß.gewinne: " );
-    _pSumVeraeussGewinne->textfont( FL_HELVETICA_BOLD );
+    _tooltipVeraeussGewinn.add( "Veräußerungsgewinne fallen an, wenn der Vertrag " )
+               .add( "nach dem 1.1.2009 abgeschlossen wurde.\n" )
+               .add( "Verlängerungen nach dem 1.1.2009 sind unschädlich." );
+    _pSumVeraeussGewinne->tooltip( _tooltipVeraeussGewinn.get() );
     
-    _pMietertragNachSteuer = new Flx_Output( _pSumVeraeussGewinne->x(),
+    _pMietertragVorSteuer = new Flx_Output( _pSumVeraeussGewinne->x(),
                                              _pSumVeraeussGewinne->y() + _pSumVeraeussGewinne->h() + dy, 
-                                             55, 25, "Jhrl. Ertrag nach Steuern: " );
-    _pSteuersatz3 = new Flx_FloatInput( _pMietertragNachSteuer->x() + _pMietertragNachSteuer->w() + 10,
-                                   _pMietertragNachSteuer->y(),
-                                   35, 25, " %Steuer" );
-    _pSteuersatz3->align( FL_ALIGN_RIGHT );
+                                             55, 25, "Jhrl. Ertrag vor Steuern: " );
+    _pMietertragVorSteuer->textfont( FL_HELVETICA_BOLD );
+    _tooltipMietertrag.add( "Über alle Verträge: Einnahmen - Wertverlust.\n")
+       .add( "Einnahme = Tagesmiete * Miettage.\n" )
+       .add( "Wertverlust = (Kaufpreis - Rückkauf) / Jahre Mietdauer.\n" )
+       .add( "Keine Abzinsung. Ohne steuerliche Aspekte." );
+      _pMietertragVorSteuer->tooltip( _tooltipMietertrag.get() );    
     
-    _pBtnRefreshErtrag = new Flx_Button( _pSteuersatz3->x() + _pSteuersatz3->w() + 70,
-                                         _pSteuersatz3->y(),
-                                         25, 25, "@>" );
-    _pBtnRefreshErtrag->signalSelected.connect<MainWindow, &MainWindow::onRefreshErtrag>( this );
+//    _pSteuersatz3 = new Flx_FloatInput( _pMietertragVorSteuer->x() + _pMietertragVorSteuer->w() + 10,
+//                                   _pMietertragVorSteuer->y(),
+//                                   35, 25, " %Steuer" );
+//    _pSteuersatz3->align( FL_ALIGN_RIGHT );
+//    
+//    _pBtnRefreshErtrag = new Flx_Button( _pSteuersatz3->x() + _pSteuersatz3->w() + 70,
+//                                         _pSteuersatz3->y(),
+//                                         25, 25, "@>" );
+//    _pBtnRefreshErtrag->signalSelected.connect<MainWindow, &MainWindow::onRefreshErtrag>( this );
     pGrp->end();
     
     return *pGrp;
@@ -658,10 +671,10 @@ void MainWindow::onRefreshVeranlagungsdaten( Flx_Button &, ActionParm & ) {
     signalRefreshVeranlagung.send( *this, parm );
 }
 
-void MainWindow::onRefreshErtrag( flx::Flx_Button &, flx::ActionParm & ) {
-    float steuersatz = _pSteuersatz3->floatValue();
-    signalRefreshMietertrag.send( this, &steuersatz );
-}
+//void MainWindow::onRefreshErtrag( flx::Flx_Button &, flx::ActionParm & ) {
+//    float steuersatz = _pSteuersatz3->floatValue();
+//    signalRefreshMietertrag.send( this, &steuersatz );
+//}
 
 void MainWindow::onAlphaInputChanged( flx::Flx_Input &inp, flx::ActionParm & ) {
     _isDirty = true;
@@ -728,10 +741,12 @@ void MainWindow::setDepotData( DepotData depotData ) {
     _pSumVeraeussGewinne->
         value( to_string( depotData.SummeVeraeussGewinne ).c_str() );
     
-    if( _pSteuersatz3->floatValue() > 0 ) {
-        int e =  (int)((float)depotData.JhrlEtragNachSteuern * _pSteuersatz3->floatValue() );
-        _pMietertragNachSteuer->value( to_string( e ).c_str() );
-    }
+    _pMietertragVorSteuer->value( to_string( depotData.JahresertragVorSteuer ).c_str() );
+    
+//    if( _pSteuersatz3->floatValue() > 0 ) {
+//        int e =  (int)((float)depotData.JahresertragOhneAfa * _pSteuersatz3->floatValue() / 100 );
+//        _pMietertragVorSteuer->value( to_string( e ).c_str() );
+//    }
    
 }
 
@@ -750,11 +765,11 @@ void MainWindow::setVeranlagungsdaten( VeranlagungTableDataPtr pVeranlagungsdate
 void MainWindow::setSteuersatz( float prozent ) {
     _pSteuersatz->value( prozent, "%.0f" );
     _pSteuersatz2->value( prozent, "%.0f" );
-    _pSteuersatz3->value( prozent, "%.0f" );
+//    _pSteuersatz3->value( prozent, "%.0f" );
 }
 
 void MainWindow::setJahresMietertrag( int euro ) {
-    _pMietertragNachSteuer->value( to_string( euro ).c_str() );
+    _pMietertragVorSteuer->value( to_string( euro ).c_str() );
 }
 
 //void MainWindow::clear() {

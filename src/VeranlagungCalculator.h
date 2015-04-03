@@ -27,7 +27,7 @@ public:
     void onRefreshVeranlagung( MainWindow &, VeranlagungParm & );
     
     virtual ~VeranlagungCalculator();
-private:
+
     int getAnzahlMiettage( 
                        const my::MyDate &mietbeginn, 
                        const my::MyDate &mietende,

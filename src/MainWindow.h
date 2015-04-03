@@ -148,14 +148,17 @@ private:
     flx::Flx_Output *_pDepotZeitwert;
     flx::Flx_Output *_pDepotSummeRueckkauf;
     flx::Flx_Output *_pSumVeraeussGewinne;
-    flx::Flx_Output *_pMietertragNachSteuer;
-    flx::Flx_FloatInput *_pSteuersatz3;
-    flx::Flx_Button *_pBtnRefreshErtrag;
+    flx::Flx_Output *_pMietertragVorSteuer;
+//    flx::Flx_FloatInput *_pSteuersatz3;
+//    flx::Flx_Button *_pBtnRefreshErtrag;
     flx::Flx_Choice *_pJahrAuswahl;
     flx::Flx_FloatInput *_pSteuersatz2;
     flx::Flx_Table *_pSteuerTable;
     flx::Flx_Button *_pBtnRefreshTable;
     VeranlagungTableDataPtr _pVeranlagungsdaten;
+    my::CharBuffer _tooltipMietertrag;
+    my::CharBuffer _tooltipZeitwert;
+    my::CharBuffer _tooltipVeraeussGewinn;
 };
 
 #endif	/* MAINWINDOW_H */

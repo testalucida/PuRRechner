@@ -16,8 +16,23 @@ public:
     Calculator();
     void onCalculate( IRendite &rendite, CalculationData &data );
     virtual ~Calculator();
+    
+    /**
+     * Kalkuliert die Rendite für 1 Container ohne Berücksichtigung
+     * der AfA
+     * @param  data: Daten für 1 Container
+     * @return 
+     */
     float calculateOhneAfa( const CalculationData & ) const;
+    
+    /**
+     * Kalkuliert die Rendite für 1 Container unter Berücksichtigung
+     * der AfA
+     * @param  data: Daten für 1 Container
+     * @return 
+     */
     float calculateMitAfa( const CalculationData & ) const;
+    
     /**
      * Errechnet den Diskontierungssummenfaktor
      * @param zins: in Prozent, z.B. 3.4

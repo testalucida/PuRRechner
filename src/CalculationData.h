@@ -8,6 +8,9 @@
 #ifndef CALCULATIONDATA_H
 #define	CALCULATIONDATA_H
 
+/**
+ Kalkulationsdaten bezogen auf 1 Container
+ */
 struct CalculationData {
 public:
     float Einzelpreis;
