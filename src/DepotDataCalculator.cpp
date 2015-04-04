@@ -56,24 +56,20 @@ DepotData DepotDataCalculator::getDepotData() const {
 
 int DepotDataCalculator::getJahresertragVorSteuern( VertragPtr pV ) const {
     int ertrag = 0;
-//    for_each( _pVertraegeVector->begin(), _pVertraegeVector->end(), [&] (VertragPtr pV ) {
-        //Nur berücksichtigen, die wenigstens 1 Tag Miete in diesem Jahr
-        //erbracht haben:
+
+    int miettage = getMiettage( pV->Mietbeginn, pV->Mietende );
+
+    if( miettage > 0 ) {
+        int einnahmen = pV->Tagesmiete * miettage;
+        int wertverlust = (pV->Einzelpreis - pV->Rueckkaufswert) / pV->JahreMietdauer;
+        ertrag += ( ( einnahmen - wertverlust ) * pV->Menge );
+    }
     
-        int miettage = getMiettage( pV->Mietbeginn, pV->Mietende );
-        
-        fprintf( stderr, "Vertrag %s, Beginn %s, Ende %s, Miettage: %d\n", 
-                    pV->Vertrag.get(), 
-                    pV->Mietbeginn.ToEurString().c_str(), 
-                    pV->Mietende.ToEurString().c_str(),
-                    miettage );
-        
-        if( miettage > 0 ) {
-            int einnahmen = pV->Tagesmiete * miettage;
-            int wertverlust = (pV->Einzelpreis - pV->Rueckkaufswert) / pV->JahreMietdauer;
-            ertrag += (einnahmen - wertverlust) * pV->Menge;
-        }
-//    } );
+    fprintf( stderr, "Vertrag %s, Beginn %s, Ende %s, Miettage: %d, Ertrag: %d\n", 
+            pV->Vertrag.get(), 
+            pV->Mietbeginn.ToEurString().c_str(), 
+            pV->Mietende.ToEurString().c_str(),
+            miettage, ertrag );
     
     return ertrag;
 }
@@ -109,43 +105,8 @@ int DepotDataCalculator::getMiettage( const my::MyDate &mietBeginn,
                                       const my::MyDate &mietEnde ) const 
 {
     MyDate today( true );
-    
     VeranlagungCalculator calc;
-    
     return calc.getAnzahlMiettage( mietBeginn, mietEnde, today.GetYear() );
-    
-    
-//    int year = today.GetYear();
-//    MyDate yearBegin ( 1, 1, year );
-//    MyDate yearEnd( 31, 12, year );
-//    
-//    MyDate first, last;
-//    
-//    if( mietEnde <= yearBegin ) {
-//        //Mietzeit schon zu Ende
-//        return 0;
-//    } else {
-//        if( mietEnde >= yearEnd ) {
-//            last = mietEnde;
-//        } else {
-//            //Mietende irgendwann in diesem Jahr
-//            last = mietEnde;
-//        }
-//    }
-//    
-//    if( mietBeginn <= yearBegin ) {
-//        first = yearBegin;
-//    } else {
-//        if( mietBeginn <= yearEnd ) {
-//            first = mietBeginn;
-//        } else {
-//            //Mietbeginn erst nächstes Jahr
-//            return 0;
-//        }
-//    }
-//  
-//    int miettage = DateTimeCalculator::GetDuration( first, last );
-//    return miettage;
 }
 
 DepotDataCalculator::~DepotDataCalculator( ) {

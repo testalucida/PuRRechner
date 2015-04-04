@@ -10,6 +10,7 @@
 #include "MainWindow.h"
 #include "Vertrag.h"
 #include "Vertraege.h"
+#include "VertragProvider.h"
 
 SaveHandler::SaveHandler( ) : _pVertraege( NULL ) {
 }
@@ -36,7 +37,8 @@ void SaveHandler::saveVertrag( MainWindow &w, Vertrag &v ) {
     
     if( _pVertraege ) {
         _pVertraege->clear();
-        io.getVertraege( *_pVertraege );
+        VertragProvider::instance().getVertraege( *_pVertraege );
+//        io.getVertraege( *_pVertraege );
     }
     
 }

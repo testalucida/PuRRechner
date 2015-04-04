@@ -39,6 +39,8 @@
         <itemPath>/home/max/cpp/fltk/PuRRechner/src/Vertraege.cpp</itemPath>
         <itemPath>/home/max/cpp/fltk/PuRRechner/src/Vertraege.h</itemPath>
         <itemPath>/home/max/cpp/fltk/PuRRechner/src/Vertrag.h</itemPath>
+        <itemPath>/home/max/cpp/fltk/PuRRechner/src/VertragProvider.cpp</itemPath>
+        <itemPath>/home/max/cpp/fltk/PuRRechner/src/VertragProvider.h</itemPath>
         <itemPath>/home/max/cpp/fltk/PuRRechner/src/WertverlustData.h</itemPath>
         <itemPath>/home/max/cpp/fltk/PuRRechner/src/main.cpp</itemPath>
         <itemPath>/home/max/cpp/fltk/PuRRechner/src/password.h</itemPath>
@@ -228,6 +230,16 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VertragProvider.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VertragProvider.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="/home/max/cpp/fltk/PuRRechner/src/WertverlustData.h"
             ex="false"
             tool="3"
@@ -407,6 +419,16 @@
             flavor2="0">
       </item>
       <item path="/home/max/cpp/fltk/PuRRechner/src/Vertrag.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VertragProvider.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/home/max/cpp/fltk/PuRRechner/src/VertragProvider.h"
             ex="false"
             tool="3"
             flavor2="0">

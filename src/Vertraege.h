@@ -27,7 +27,7 @@ public:
      * in einem Vector von VertragPtr-Instanzen zurück.
      * @return  VertragPtrVectorPtr
      */
-    VertragPtrVectorPtr getVertraege() ;
+    VertragPtrVectorPtr getVertraege() const;
     
     /**
      * Liefert ein VertragPtr-Objekt, das aus den Daten
@@ -36,12 +36,14 @@ public:
      * @return  VertragPtr
      */
     VertragPtr getVertrag( int idx ) const;
-    
+     int getColumnIndex( const char *pHeader ) const;
+     void buildHeaderIndexMapper();
+     
     virtual ~VertraegeTableData();
 private:
-    void buildHeaderIndexMapper();
+    
     VertragPtr createVertragFromRow( int row ) const;
-    int getColumnIndex( const char *pHeader ) const;
+   
 private:
     std::map<std::string, int> _headerIndexMapper;
 };

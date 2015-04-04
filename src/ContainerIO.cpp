@@ -27,11 +27,13 @@ VertraegeTableData &ContainerIO::getVertraege( VertraegeTableData& vertraege ) {
     //                        0        1       2      3        4           5                                6
     sql.add( ", tagesmiete, jahremietdauer, mietbeginn, mietende, rueckkauf, rueckkauf * menge as gesamtrueckkauf " );
     //             7             8             9           10       11                                   12                 
-    sql.add( ", rueckkauf*menge - ((menge*einzelpreis*afa*jahremietdauer)/100) as veraeussgewinn, afa " );
+    sql.add( ", 0 as veraeussgewinn, afa " );
     //                                                                                13          14
     sql.add( "from Container order by mietende desc, vertrag, lfdnr" );
     
     _mysql.select( sql.get(), vertraege );
+    
+    vertraege.buildHeaderIndexMapper();
     
     return vertraege;
 }

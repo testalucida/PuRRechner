@@ -82,7 +82,7 @@ private:
     void onVertraegeTableSelectionChanged( flx::Flx_Table &, flx::SelectionEvent & );
     void onNumericInputChanged( flx::Flx_NumericInput &, flx::ActionParm & );
     void onAlphaInputChanged( flx::Flx_Input &, flx::ActionParm & );
-    void onMietbeginnChanged( flx::Flx_DateChooser &, my::MyDate & );
+    void onMietZeitraumChanged( flx::Flx_DateChooser &, my::MyDate & );
     void onRefreshVeranlagungsdaten( flx::Flx_Button &, flx::ActionParm & );
     void onRefreshErtrag( flx::Flx_Button &, flx::ActionParm & );
     flx::Flx_Group &createTopGroup();
@@ -137,7 +137,8 @@ private:
     flx::Flx_IntInput *_pLfdNr;
     
     flx::Flx_DateChooser *_pMietbeginn;
-    flx::Flx_Output *_pMietende;
+    flx::Flx_DateChooser *_pMietende;
+//    flx::Flx_Output *_pMietende;
     flx::Flx_IntInput *_pAnzahl;
     
     //flx::Flx_Button *_pBtnSave;

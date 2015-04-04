@@ -13,9 +13,7 @@ VertraegeTableData::VertraegeTableData( ) : TableData() {
     
 }
 
-VertragPtrVectorPtr VertraegeTableData::getVertraege() {
-    buildHeaderIndexMapper();
-    
+VertragPtrVectorPtr VertraegeTableData::getVertraege() const {
     VertragPtrVectorPtr pVertragPtrVector( new std::vector<VertragPtr>() );
     
     for( int r = 0, rmax = getRowCount(); r < rmax; r++ ) {

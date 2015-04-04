@@ -275,8 +275,12 @@ Flx_Group &MainWindow::createVertragGroup( int x, int y, int w, int h ) {
                                                   _pAngebot->y() + _pAngebot->h() + _yspacing, 
                                                   90, INPUT_DATE, "Mietbeginn: " );
     
-    _pMietende = (Flx_Output*)createInput( _pVertrag->x(), _pMietbeginn->y(), 
-                                           90, OUTPUT, "Mietende: ");
+//    _pMietende = (Flx_Output*)createInput( _pVertrag->x(), _pMietbeginn->y(), 
+//                                           90, OUTPUT, "Mietende: ");
+    
+    _pMietende = (Flx_DateChooser*)createInput( _pVertrag->x(), 
+                                                  _pMietbeginn->y(), 
+                                                  90, INPUT_DATE, "Mietende: " );
     
     _pAnzahl = (Flx_IntInput*)createInput( _pKunde->x(), _pMietende->y(), 45,
                                             INPUT_INT, "Anzahl: " );
@@ -316,7 +320,7 @@ Fl_Widget *MainWindow::createInput( int x, int y, int w, int kindInput, const ch
         case INPUT_DATE:
             p = new Flx_DateChooser( x, y, _inputHeight, lbl );
             ((Flx_DateChooser*)p)->signalDateSelected.
-                    connect<MainWindow, &MainWindow::onMietbeginnChanged>( this );
+                    connect<MainWindow, &MainWindow::onMietZeitraumChanged>( this );
             break;
         case OUTPUT:
             p = new Flx_Output( x, y, w, _inputHeight, lbl );
@@ -399,7 +403,7 @@ flx::Flx_Group &MainWindow::createDepotGroup( int x, int y, int w, int h ) {
     
     _pMietertragVorSteuer = new Flx_Output( _pSumVeraeussGewinne->x(),
                                              _pSumVeraeussGewinne->y() + _pSumVeraeussGewinne->h() + dy, 
-                                             55, 25, "Jhrl. Ertrag vor Steuern: " );
+                                             55, 25, "Ertrag vor St. akt. Jahr: " );
     _pMietertragVorSteuer->textfont( FL_HELVETICA_BOLD );
     _tooltipMietertrag.add( "Über alle Verträge: Einnahmen - Wertverlust.\n")
        .add( "Einnahme = Tagesmiete * Miettage.\n" )
@@ -549,7 +553,8 @@ void MainWindow::clearInputFields() {
     _pMietbeginn->setDate( today );
     MyDate mietende( today );
     DateTimeCalculator::ComputeYears( mietende, 5 );
-    _pMietende->value( mietende.ToEurString().c_str() );
+//    _pMietende->value( mietende.ToEurString().c_str() );
+    _pMietende->setDate( mietende );
 }
 
 void MainWindow::onBtnRenditePushed( flx::Flx_Button &, flx::ActionParm & ) {
@@ -576,7 +581,8 @@ void MainWindow::sendSaveSignal() {
     vertrag.Kunde.add( _pKunde->value() );
     vertrag.Menge = _pAnzahl->intValue();
     vertrag.Mietbeginn.FromDate( _pMietbeginn->getDate() );
-    vertrag.Mietende.FromEurString( _pMietende->value() );
+//    vertrag.Mietende.FromEurString( _pMietende->value() );
+    vertrag.Mietende = _pMietende->getDate();
     signalSaveVertrag.send( *this, vertrag );
     _pBtnSave->deactivate();
     _isDirty = false;
@@ -602,7 +608,8 @@ void MainWindow::setInputFieldsFromTableRow() {
     _pAnzahl->value( to_string( pV->Menge ).c_str() );
     _pKunde->value( pV->Kunde.get() );
     _pMietbeginn->setDate( pV->Mietbeginn );
-    _pMietende->value( pV->Mietende.ToEurString().c_str() );
+//    _pMietende->value( pV->Mietende.ToEurString().c_str() );
+    _pMietende->setDate( pV->Mietende );
     _pAfaChoice->value( pV->AfA < 12 ? 0 : 1 );   
    
     _pEinzelpreis->take_focus();
@@ -645,23 +652,31 @@ void MainWindow::onNumericInputChanged( flx::Flx_NumericInput &inp, flx::ActionP
             const MyDate &beginn = _pMietbeginn->getDate();
             MyDate ende( beginn );
             DateTimeCalculator::ComputeYears( ende, nJahre );
-            _pMietende->const_value( ende.ToEurString() );    
+//            _pMietende->const_value( ende.ToEurString() );    
+            _pMietende->setDate( ende );
         } else {
-            _pMietende->value( "" );            
+//            _pMietende->value( "" );     
+            _pMietende->setDate( _pMietbeginn->getDate() );
         }
     }
     _isDirty = true;
     checkSaveButton();
 }
 
-void MainWindow::onMietbeginnChanged( Flx_DateChooser &, my::MyDate &date ) {
-    int nJahre = _pLaufzeit->intValue();
-    if( nJahre > 0 ) {
-        MyDate ende( date );
-        DateTimeCalculator::ComputeYears( ende, nJahre );
-        _pMietende->const_value( ende.ToEurString() );
+void MainWindow::onMietZeitraumChanged( Flx_DateChooser &chooser, my::MyDate &date ) {
+    if( &chooser == _pMietbeginn ) {
+        int nJahre = _pLaufzeit->intValue();
+        if( nJahre > 0 ) {
+            MyDate ende( date );
+            DateTimeCalculator::ComputeYears( ende, nJahre );
+    //        _pMietende->const_value( ende.ToEurString() );
+            _pMietende->setDate( ende );
+        } else {
+            //Mietende verändert
+        }
     }
     _isDirty = true;
+    checkSaveButton();
 }
 
 void MainWindow::onRefreshVeranlagungsdaten( Flx_Button &, ActionParm & ) {
@@ -760,6 +775,7 @@ void MainWindow::setVeranlagungsjahre( std::vector<int> &jahre ) {
 void MainWindow::setVeranlagungsdaten( VeranlagungTableDataPtr pVeranlagungsdaten ) {
     _pVeranlagungsdaten = pVeranlagungsdaten;
     _pSteuerTable->setTableData( *pVeranlagungsdaten );
+    //fprintf( stderr, "Anzahl Zeilen: %d\n", pVeranlagungsdaten->getRowCount() );
 }
 
 void MainWindow::setSteuersatz( float prozent ) {

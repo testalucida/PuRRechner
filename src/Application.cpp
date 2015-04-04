@@ -7,8 +7,9 @@
 
 #include "Application.h"
 #include "MainWindow.h"
-#include "ContainerIO.h"
+//#include "ContainerIO.h"
 #include "DepotDataCalculator.h"
+#include "VertragProvider.h"
 
 #include <FL/Fl.H>
 
@@ -37,12 +38,13 @@ Application::Application( ) {
 void Application::init() {
     ContainerIO io;
     io.connect();
-    _pWin->setVertraege( io.getVertraege( _vertraegeTableData ) );
+    //_pWin->setVertraege( io.getVertraege( _vertraegeTableData ) );
+    _pWin->setVertraege( VertragProvider::instance().getVertraege( _vertraegeTableData ) );
     DepotDataCalculator wertCalc( _vertraegeTableData.getVertraege() );
     DepotData wert = wertCalc.getDepotData();
     _pWin->setSteuersatz( 30 );
     _pWin->setDepotData( wert );
-    std::vector<int> jahre( {2014, 2015, 2016, 2017, 2018});
+    std::vector<int> jahre( {2014, 2015, 2016, 2017, 2018, 2019, 2020});
     _pWin->setVeranlagungsjahre( jahre );
     
 }
